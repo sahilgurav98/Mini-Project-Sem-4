@@ -1,0 +1,49 @@
+<%- include('../layouts/header') %>
+<h2 class="mb-4 border-bottom border-dark border-2 pb-2">Student Dashboard</h2>
+<div class="row">
+    <div class="col-md-8">
+        <div class="card rounded-0 border-dark border-2 mb-4">
+            <div class="card-header bg-dark text-white rounded-0">Place New Order</div>
+            <div class="card-body">
+                <table class="table table-bordered align-middle">
+                    <thead class="table-dark"><tr><th>Item</th><th>Price</th><th>Quantity</th></tr></thead>
+                    <tbody id="menu-items">
+                        <% products.forEach(p => { %>
+                            <tr>
+                                <td class="item-name fw-bold"><%= p.name %></td>
+                                <td>₹<span class="item-price"><%= p.price %></span></td>
+                                <td><input type="number" class="form-control rounded-0 border-dark item-qty" value="0" min="0" onchange="calcTotal()"></td>
+                            </tr>
+                        <% }) %>
+                    </tbody>
+                </table>
+                <div class="d-flex justify-content-between align-items-center bg-light p-3 border border-dark border-2">
+                    <h4 class="m-0">Total: ₹<span id="grandTotal">0</span></h4>
+                    <button class="btn btn-dark rounded-0 px-4 fw-bold" onclick="submitOrder()">CONFIRM ORDER</button>
+                </div>
+                <div id="order-msg" class="mt-2"></div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card rounded-0 border-dark border-2">
+            <div class="card-header bg-secondary text-white rounded-0">My Orders</div>
+            <div class="card-body p-0" style="max-height: 400px; overflow-y:auto;">
+                <ul class="list-group rounded-0">
+                    <% orders.forEach(o => { %>
+                        <li class="list-group-item border-bottom border-dark">
+                            <strong>Status:</strong> 
+                            <span class="badge <%= o.status==='Fulfilled'?'bg-success':'bg-warning text-dark'%> rounded-0"><%= o.status %></span><br>
+                            <small class="text-muted"><%= o.orderTime.toLocaleString() %></small>
+                            <ul class="mb-1 mt-1 ps-3 small">
+                                <% o.items.forEach(i => { %> <li><%= i.quantity %>x <%= i.itemName %></li> <% }) %>
+                            </ul>
+                            <strong>Total: ₹<%= o.totalAmount %></strong>
+                        </li>
+                    <% }) %>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+<%- include('../layouts/footer') %>

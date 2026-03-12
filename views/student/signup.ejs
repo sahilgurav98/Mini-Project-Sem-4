@@ -1,0 +1,62 @@
+<%- include('../layouts/header') %>
+<div class="row justify-content-center mt-4 mb-5">
+    <div class="col-md-6">
+        <div class="card rounded-0 shadow-sm border-dark border-2">
+            <div class="card-header bg-dark text-white rounded-0 py-3">
+                <h4 class="mb-0"><span class="text-primary">///</span> NEW STUDENT REGISTRATION</h4>
+            </div>
+            <div class="card-body p-4">
+                <% if(error) { %> 
+                    <div class="alert alert-danger rounded-0 border-dark fw-bold"><%= error %></div> 
+                <% } %>
+                
+                <form action="/auth/signup/student" method="POST">
+                    <div class="mb-3">
+                        <label class="fw-bold small text-uppercase">Full Name</label>
+                        <input type="text" name="name" class="form-control rounded-0 border-dark" placeholder="John Doe" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="fw-bold small text-uppercase">Email Address</label>
+                        <input type="email" name="email" class="form-control rounded-0 border-dark" placeholder="student@college.edu" required>
+                    </div>
+
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <label class="fw-bold small text-uppercase">Registration Number</label>
+                            <input type="text" name="regNo" class="form-control rounded-0 border-dark" placeholder="e.g. 2023CS01" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="fw-bold small text-uppercase">Year</label>
+                            <select name="year" class="form-select rounded-0 border-dark" required>
+                                <option value="" disabled selected>Select Year...</option>
+                                <option value="1st Year">1st Year</option>
+                                <option value="2nd Year">2nd Year</option>
+                                <option value="3rd Year">3rd Year</option>
+                                <option value="4th Year">4th Year</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="fw-bold small text-uppercase">Branch</label>
+                        <input type="text" name="branch" class="form-control rounded-0 border-dark" placeholder="e.g. CSE, IT, MECH" required>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="fw-bold small text-uppercase">Create Password</label>
+                        <input type="password" name="password" class="form-control rounded-0 border-dark" required>
+                    </div>
+
+                    <button type="submit" class="btn btn-dark rounded-0 w-100 fw-bold fs-5 py-2">REGISTER ACCOUNT</button>
+                </form>
+                
+                <div class="mt-4 text-center border-top border-dark pt-3">
+                    <span class="text-muted">Already have an account?</span> 
+                    <a href="/auth/login/student" class="text-dark fw-bold text-decoration-none">Login here</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<%- include('../layouts/footer') %>

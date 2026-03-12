@@ -1,0 +1,39 @@
+<%- include('../layouts/header') %>
+<div class="row justify-content-center mt-5">
+    <div class="col-md-5">
+        <div class="card rounded-0 shadow-lg border-dark border-2">
+            <div class="card-header bg-white border-bottom border-dark border-2 py-4 text-center">
+                <h3 class="mb-0 fw-bold">STUDENT PORTAL</h3>
+                <small class="text-muted text-uppercase">Access your canteen account</small>
+            </div>
+            <div class="card-body p-4 bg-light">
+                <% if(error) { %> 
+                    <div class="alert alert-danger rounded-0 border-dark fw-bold"><%= error %></div> 
+                <% } %>
+                
+                <form action="/auth/login/student" method="POST">
+                    <div class="mb-3">
+                        <label class="fw-bold small text-uppercase">Registered Email</label>
+                        <input type="email" name="email" class="form-control form-control-lg rounded-0 border-dark" required>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label class="fw-bold small text-uppercase">Password</label>
+                        <input type="password" name="password" class="form-control form-control-lg rounded-0 border-dark" required>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary rounded-0 w-100 fw-bold fs-5 border-dark border-2">LOGIN</button>
+                </form>
+                
+                <div class="mt-4 text-center">
+                    <a href="/auth/signup/student" class="btn btn-outline-dark rounded-0 w-100 fw-bold">CREATE NEW ACCOUNT</a>
+                </div>
+                
+                <div class="mt-4 text-center">
+                    <a href="/auth/login/admin" class="text-secondary small text-decoration-none fw-bold">System Administrator Access &rarr;</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<%- include('../layouts/footer') %>

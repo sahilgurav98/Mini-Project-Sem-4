@@ -1,0 +1,180 @@
+<%- include('../layouts/header') %>
+<h2 class="mb-4 border-bottom border-dark border-2 pb-2">Admin Dashboard</h2>
+
+<div class="card rounded-0 border-dark border-2 mb-4 shadow-sm">
+    <div class="card-header bg-dark text-white rounded-0 d-flex justify-content-between align-items-center">
+        <h5 class="mb-0"><span class="text-primary">///</span> AI Demand Predictor (FNN)</h5>
+        
+        <% if(isModelTrained) { %>
+            <span class="badge bg-success border border-light rounded-0 px-3 py-2">🟢 MODEL ONLINE & TRAINED</span>
+        <% } else { %>
+            <span class="badge bg-danger border border-light rounded-0 px-3 py-2">🔴 MODEL OFFLINE (NEEDS DATA)</span>
+        <% } %>
+    </div>
+    
+    <div class="card-body bg-light">
+        <% if(error) { %><div class="alert alert-danger rounded-0 border-dark fw-bold"><%= error %></div><% } %>
+        
+        <% if(isModelTrained && !prediction) { %>
+            <div class="alert alert-success rounded-0 border-dark border-2 fw-bold">
+                ✓ AI Model successfully trained and loaded into server memory! Ready for predictions.
+            </div>
+        <% } %>
+
+        <div class="row">
+            <div class="col-md-5 border-end border-dark border-2 pe-4">
+                <form action="/admin/ml/train" method="POST" enctype="multipart/form-data" class="h-100 d-flex flex-column justify-content-center">
+                    <label class="fw-bold mb-2 text-uppercase">1. Upload Training Data (.xlsx / .csv)</label>
+                    <div class="input-group mb-2">
+                        <input type="file" name="dataset" class="form-control rounded-0 border-dark" required>
+                        <button class="btn btn-dark rounded-0 fw-bold">TRAIN AI</button>
+                    </div>
+                    <small class="text-muted">Upload the latest canteen sales data to teach the AI.</small>
+                </form>
+            </div>
+
+            <div class="col-md-7 ps-4">
+                <form action="/admin/ml/predict" method="POST" class="row g-2">
+                    <label class="fw-bold mb-2 text-uppercase w-100">2. Run Demand Prediction</label>
+                    <div class="col-md-3"><select name="day" class="form-select rounded-0 border-dark"><option>Mon</option><option>Tue</option><option>Wed</option><option>Thu</option><option>Fri</option><option>Sat</option><option>Sun</option></select></div>
+                    <div class="col-md-3"><select name="time" class="form-select rounded-0 border-dark"><option>Breakfast</option><option>Lunch</option><option>Dinner</option></select></div>
+                    <div class="col-md-3"><input type="text" name="itemName" placeholder="Item (e.g. Rice)" class="form-control rounded-0 border-dark" required></div>
+                    <div class="col-md-3"><input type="number" name="price" placeholder="Price (₹)" class="form-control rounded-0 border-dark" required></div>
+                    <div class="col-md-4"><input type="number" name="avgSales" placeholder="Avg Daily Sales" class="form-control rounded-0 border-dark" required></div>
+                    <div class="col-md-4"><select name="event" class="form-select rounded-0 border-dark"><option value="No">Event: No</option><option value="Yes">Event: Yes</option></select></div>
+                    <div class="col-md-4">
+                        <button class="btn btn-primary rounded-0 w-100 fw-bold border-dark border-2" <%= !isModelTrained ? 'disabled' : '' %>>
+                            PREDICT
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <% if(prediction) { %>
+            <div class="alert alert-warning mt-4 mb-0 rounded-0 border-dark border-2 text-center shadow-sm">
+                <h5 class="text-uppercase mb-1">Estimated Demand for <%= prediction.item %></h5>
+                <div class="display-4 fw-bold text-dark"><%= prediction.demand %> Plates</div>
+                <small class="text-muted fw-bold">(Includes a 10% safety buffer for stock security)</small>
+            </div>
+        <% } %>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-8">
+        <div class="card rounded-0 border-dark border-2 mb-4">
+            <div class="card-header bg-dark text-white rounded-0 d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Live Orders</h5>
+                <form action="/admin/order/clear" method="POST"><button class="btn btn-sm btn-danger rounded-0">Clear All</button></form>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-bordered table-hover m-0 align-middle">
+                    <thead class="table-light"><tr><th>Student</th><th>Order Details</th><th>Status</th><th>Actions</th></tr></thead>
+                    <tbody id="live-orders-table">
+                        <% orders.forEach(o => { %>
+                            <tr>
+                                <td><strong><%= o.studentName %></strong><br><small><%= o.year %> | <%= o.branch %></small><br><small>Reg: <%= o.regNo %></small></td>
+                                <td><ul class="mb-0 small ps-3"><% o.items.forEach(i => { %><li><%= i.quantity %>x <%= i.itemName %></li><% }) %></ul><div class="mt-1 fw-bold">₹<%= o.totalAmount %></div></td>
+                                <td><span class="badge <%= o.status==='Fulfilled'?'bg-success':'bg-warning text-dark'%> rounded-0 w-100"><%= o.status %></span></td>
+                                <td>
+                                    <div class="d-flex gap-1">
+                                        <% if(o.status !== 'Fulfilled') { %><form action="/admin/order/fulfill/<%= o._id %>" method="POST"><button class="btn btn-sm btn-success rounded-0">✓</button></form><% } %>
+                                        <form action="/admin/order/delete/<%= o._id %>" method="POST"><button class="btn btn-sm btn-danger rounded-0">X</button></form>
+                                    </div>
+                                </td>
+                            </tr>
+                        <% }) %>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card rounded-0 border-dark border-2 mb-4">
+            <div class="card-header bg-dark text-white rounded-0"><h5 class="mb-0">Menu Items</h5></div>
+            <div class="card-body">
+                <form action="/admin/product/add" method="POST" class="mb-4">
+                    <input type="text" name="name" placeholder="Item Name" class="form-control rounded-0 border-dark mb-2" required>
+                    <input type="number" name="price" placeholder="Price (₹)" class="form-control rounded-0 border-dark mb-2" required>
+                    <select name="isAvailable" class="form-select rounded-0 border-dark mb-2"><option value="true">Available</option><option value="false">Unavailable</option></select>
+                    <button class="btn btn-dark rounded-0 w-100 fw-bold">ADD ITEM</button>
+                </form>
+                <ul class="list-group rounded-0">
+                    <% products.forEach(p => { %>
+                        <li class="list-group-item d-flex justify-content-between align-items-center border-dark">
+                            <div><strong><%= p.name %></strong> (₹<%= p.price %>)</div>
+                            <form action="/admin/product/delete/<%= p._id %>" method="POST"><button class="btn btn-sm btn-outline-danger rounded-0">Del</button></form>
+                        </li>
+                    <% }) %>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    // Ask the server for new orders every 3000 milliseconds (3 seconds)
+    setInterval(fetchLiveOrders, 3000);
+
+    async function fetchLiveOrders() {
+        try {
+            const response = await fetch('/admin/api/orders');
+            const orders = await response.json();
+            
+            const tbody = document.getElementById('live-orders-table');
+            if (!tbody) return;
+
+            let html = '';
+
+            // Loop through the JSON data and build the HTML rows
+            orders.forEach(o => {
+                // 1. Build the items list
+                let itemsHtml = '<ul class="mb-0 small ps-3">';
+                o.items.forEach(i => {
+                    itemsHtml += `<li>${i.quantity}x ${i.itemName}</li>`;
+                });
+                itemsHtml += `</ul><div class="mt-1 fw-bold">₹${o.totalAmount}</div>`;
+
+                // 2. Build the status badge
+                const badgeClass = o.status === 'Fulfilled' ? 'bg-success' : 'bg-warning text-dark';
+                const statusBadge = `<span class="badge ${badgeClass} rounded-0 w-100">${o.status}</span>`;
+
+                // 3. Build the action buttons
+                let actionButtons = '<div class="d-flex gap-1">';
+                if (o.status !== 'Fulfilled') {
+                    actionButtons += `
+                        <form action="/admin/order/fulfill/${o._id}" method="POST">
+                            <button class="btn btn-sm btn-success rounded-0">✓</button>
+                        </form>`;
+                }
+                actionButtons += `
+                    <form action="/admin/order/delete/${o._id}" method="POST">
+                        <button class="btn btn-sm btn-danger rounded-0">X</button>
+                    </form>
+                </div>`;
+
+                // 4. Put it all together in a table row
+                html += `
+                    <tr>
+                        <td>
+                            <strong>${o.studentName}</strong><br>
+                            <small>${o.year} | ${o.branch}</small><br>
+                            <small>Reg: ${o.regNo}</small>
+                        </td>
+                        <td>${itemsHtml}</td>
+                        <td>${statusBadge}</td>
+                        <td>${actionButtons}</td>
+                    </tr>
+                `;
+            });
+
+            // Replace the old table content with the freshly fetched data
+            tbody.innerHTML = html;
+
+        } catch (error) {
+            console.error("Error fetching live orders:", error);
+        }
+    }
+</script>
+
+<%- include('../layouts/footer') %>

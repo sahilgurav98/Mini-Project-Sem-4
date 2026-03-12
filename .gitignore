@@ -1,0 +1,13 @@
+# Dependencies
+node_modules/
+
+# Environment Variables (Keep secrets safe!)
+.env
+
+# Uploaded Excel/CSV files (Don't push random user data to public github)
+uploads/
+*.csv
+*.xlsx
+
+# Mac system files
+.DS_Store

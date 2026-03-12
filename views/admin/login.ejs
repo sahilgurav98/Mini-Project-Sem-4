@@ -1,0 +1,35 @@
+<%- include('../layouts/header') %>
+<div class="row justify-content-center mt-5">
+    <div class="col-md-4">
+        <div class="card rounded-0 border-dark border-2" style="box-shadow: 8px 8px 0px #212529;">
+            <div class="card-header bg-dark text-white rounded-0 py-3 text-center border-bottom border-secondary border-3">
+                <h4 class="mb-0 fw-bold text-uppercase">Admin Console</h4>
+                <span class="badge bg-danger rounded-0 mt-1">RESTRICTED AREA</span>
+            </div>
+            <div class="card-body p-4 bg-light">
+                <% if(error) { %> 
+                    <div class="alert alert-danger rounded-0 border-danger fw-bold"><%= error %></div> 
+                <% } %>
+                
+                <form action="/auth/login/admin" method="POST">
+                    <div class="mb-3">
+                        <label class="fw-bold small text-uppercase text-muted">Username</label>
+                        <input type="text" name="username" class="form-control rounded-0 border-dark bg-white" required>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label class="fw-bold small text-uppercase text-muted">System Password</label>
+                        <input type="password" name="password" class="form-control rounded-0 border-dark bg-white" required>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-dark rounded-0 w-100 fw-bold fs-5">UNLOCK SYSTEM</button>
+                </form>
+                
+                <div class="mt-4 text-center pt-3 border-top border-secondary">
+                    <a href="/auth/login/student" class="text-dark small text-decoration-none fw-bold">&larr; Return to Student Portal</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<%- include('../layouts/footer') %>

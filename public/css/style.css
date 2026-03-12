@@ -1,0 +1,7 @@
+/* Sharp edge "machinery" styling requirement */
+.card, .btn, .form-control, .form-select, .alert, .badge, .list-group-item {
+    border-radius: 0 !important;
+}
+.btn-dark {
+    border: 2px solid #000;
+}

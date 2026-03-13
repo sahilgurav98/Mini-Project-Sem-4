@@ -64,11 +64,22 @@ export const updateProfile = async (req, res) => {
             { new: true } // Return the updated document
         );
         
-        // Update session so the header shows the new name
-        req.session.user = updatedStudent; 
+        // FIX: Convert to plain object and re-inject the "student" role!
+        req.session.user = {
+            ...updatedStudent.toObject(),
+            role: "student"
+        };
         
-        res.render('student/profile', { user: updatedStudent, message: "Profile updated successfully!" });
+        // FIX: Force the session to save to MongoDB before showing the success message
+        req.session.save((err) => {
+            if (err) {
+                console.error("Profile session save error:", err);
+            }
+            res.render('student/profile', { user: req.session.user, message: "Profile updated successfully!" });
+        });
+        
     } catch (error) {
+        console.error("Profile Update Error:", error);
         res.render('student/profile', { user: req.session.user, message: "Error updating profile." });
     }
 };

@@ -5,16 +5,11 @@
             --shadow-bg: #0b0f19;
             --shadow-card: #111827;
             --shadow-text: #f8fafc;
-            /* Made text brighter white */
             --shadow-muted: #cbd5e1;
-            /* Lightened muted text for better contrast */
             --shadow-border: rgba(255, 255, 255, 0.15);
-            /* Slightly more visible borders */
             --admin-accent: #dc2626;
-            /* Crimson Red */
             --admin-accent-hover: #b91c1c;
             --ai-accent: #3b82f6;
-            /* Tech Blue */
         }
 
         body {
@@ -42,14 +37,13 @@
             border-bottom: 1px solid var(--ai-accent);
         }
 
-        /* Forms & Inputs - FIXED FOR VISIBILITY */
+        /* Forms & Inputs */
         .form-control,
         .form-select,
         .input-group-text {
             background-color: rgba(0, 0, 0, 0.4) !important;
             border: 1px solid var(--shadow-border) !important;
             color: #ffffff !important;
-            /* Force white text */
         }
 
         .form-control:focus,
@@ -60,13 +54,11 @@
             color: #ffffff !important;
         }
 
-        /* Fix invisible placeholders */
         .form-control::placeholder {
             color: rgba(255, 255, 255, 0.6) !important;
             opacity: 1;
         }
 
-        /* Fix dropdown menu text */
         .form-select option {
             background-color: #1f2937 !important;
             color: #ffffff !important;
@@ -77,10 +69,9 @@
             border-color: var(--ai-accent) !important;
         }
 
-        /* Tables - FIXED FOR VISIBILITY */
+        /* Tables */
         .table-custom {
             color: #ffffff !important;
-            /* Force table text to white */
             --bs-table-bg: transparent;
             --bs-table-hover-bg: rgba(255, 255, 255, 0.05);
         }
@@ -123,6 +114,20 @@
             color: white;
         }
 
+        /* Custom AI Download Button */
+        .btn-ai-download {
+            background-color: rgba(56, 189, 248, 0.1);
+            color: #38bdf8;
+            border: 1px solid rgba(56, 189, 248, 0.3);
+            transition: all 0.3s ease;
+        }
+        
+        .btn-ai-download:hover {
+            background-color: rgba(56, 189, 248, 0.2);
+            color: #fff;
+            border-color: #38bdf8;
+        }
+
         /* List Groups */
         .list-group-item {
             background-color: transparent;
@@ -142,7 +147,6 @@
             color: #34d399 !important;
         }
 
-        /* Make muted text slightly brighter */
         .text-muted {
             color: var(--shadow-muted) !important;
         }
@@ -177,39 +181,42 @@
 
             <div class="card-body p-4">
                 <% if(error) { %>
-                    <div
-                        class="alert alert-danger d-flex align-items-center rounded-3 shadow-sm border-0 bg-dark text-danger">
+                    <div class="alert alert-danger d-flex align-items-center rounded-3 shadow-sm border-0 bg-dark text-danger">
                         <i class="fa-solid fa-triangle-exclamation me-2"></i>
                         <%= error %>
                     </div>
                     <% } %>
 
                         <% if(isModelTrained && !prediction) { %>
-                            <div
-                                class="alert alert-success d-flex align-items-center rounded-3 shadow-sm border-0 bg-dark text-success-custom mb-4">
+                            <div class="alert alert-success d-flex align-items-center rounded-3 shadow-sm border-0 bg-dark text-success-custom mb-4">
                                 <i class="fa-solid fa-microchip me-2"></i> AI Model successfully trained and loaded into
                                 server memory! Ready for predictions.
                             </div>
                             <% } %>
 
                                 <div class="row g-4">
-                                    <div class="col-lg-5 border-end border-secondary pe-lg-4"
+                                    <div class="col-lg-5 border-end border-secondary pe-lg-4 d-flex flex-column justify-content-center"
                                         style="border-color: var(--shadow-border) !important;">
-                                        <form action="/admin/ml/train" method="POST" enctype="multipart/form-data"
-                                            class="h-100 d-flex flex-column justify-content-center">
-                                            <label class="fw-bold mb-3 text-uppercase text-muted small">
-                                                <i class="fa-solid fa-database me-1"></i> 1. Upload Training Data (.xlsx
-                                                / .csv)
+                                        
+                                        <div class="d-flex justify-content-between align-items-center mb-3">
+                                            <label class="fw-bold text-uppercase text-muted small mb-0">
+                                                <i class="fa-solid fa-database me-1"></i> 1. Training Data
                                             </label>
+                                            
+                                            <a href="/admin/ml/download-data" class="btn btn-sm btn-ai-download shadow-sm fw-bold">
+                                                <i class="fa-solid fa-cloud-arrow-down me-1"></i> Get Last 30 Days
+                                            </a>
+                                        </div>
+
+                                        <form action="/admin/ml/train" method="POST" enctype="multipart/form-data">
                                             <div class="input-group mb-2 shadow-sm">
-                                                <input type="file" name="dataset" class="form-control ai-input"
-                                                    required>
+                                                <input type="file" name="dataset" class="form-control ai-input" accept=".csv, .xlsx" required>
                                                 <button class="btn btn-ai fw-bold px-4">
                                                     <i class="fa-solid fa-gears"></i> TRAIN
                                                 </button>
                                             </div>
                                             <small class="text-muted"><i class="fa-solid fa-circle-info me-1"></i>
-                                                Upload the latest canteen sales data to teach the AI.</small>
+                                                Download recent CSV, edit 'Events' if needed, and upload.</small>
                                         </form>
                                     </div>
 
@@ -503,4 +510,4 @@
         }
     </script>
 
-    <%- include('../layouts/footer') %>
+<%- include('../layouts/footer') %>

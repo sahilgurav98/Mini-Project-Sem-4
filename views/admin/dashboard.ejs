@@ -1,180 +1,494 @@
 <%- include('../layouts/header') %>
-<h2 class="mb-4 border-bottom border-dark border-2 pb-2">Admin Dashboard</h2>
 
-<div class="card rounded-0 border-dark border-2 mb-4 shadow-sm">
-    <div class="card-header bg-dark text-white rounded-0 d-flex justify-content-between align-items-center">
-        <h5 class="mb-0"><span class="text-primary">///</span> AI Demand Predictor (FNN)</h5>
-        
-        <% if(isModelTrained) { %>
-            <span class="badge bg-success border border-light rounded-0 px-3 py-2">🟢 MODEL ONLINE & TRAINED</span>
-        <% } else { %>
-            <span class="badge bg-danger border border-light rounded-0 px-3 py-2">🔴 MODEL OFFLINE (NEEDS DATA)</span>
-        <% } %>
-    </div>
-    
-    <div class="card-body bg-light">
-        <% if(error) { %><div class="alert alert-danger rounded-0 border-dark fw-bold"><%= error %></div><% } %>
-        
-        <% if(isModelTrained && !prediction) { %>
-            <div class="alert alert-success rounded-0 border-dark border-2 fw-bold">
-                ✓ AI Model successfully trained and loaded into server memory! Ready for predictions.
-            </div>
-        <% } %>
+    <style>
+        :root {
+            --shadow-bg: #0b0f19;
+            --shadow-card: #111827;
+            --shadow-text: #f8fafc;
+            /* Made text brighter white */
+            --shadow-muted: #cbd5e1;
+            /* Lightened muted text for better contrast */
+            --shadow-border: rgba(255, 255, 255, 0.15);
+            /* Slightly more visible borders */
+            --admin-accent: #dc2626;
+            /* Crimson Red */
+            --admin-accent-hover: #b91c1c;
+            --ai-accent: #3b82f6;
+            /* Tech Blue */
+        }
 
-        <div class="row">
-            <div class="col-md-5 border-end border-dark border-2 pe-4">
-                <form action="/admin/ml/train" method="POST" enctype="multipart/form-data" class="h-100 d-flex flex-column justify-content-center">
-                    <label class="fw-bold mb-2 text-uppercase">1. Upload Training Data (.xlsx / .csv)</label>
-                    <div class="input-group mb-2">
-                        <input type="file" name="dataset" class="form-control rounded-0 border-dark" required>
-                        <button class="btn btn-dark rounded-0 fw-bold">TRAIN AI</button>
-                    </div>
-                    <small class="text-muted">Upload the latest canteen sales data to teach the AI.</small>
-                </form>
-            </div>
+        body {
+            background-color: var(--shadow-bg);
+            color: var(--shadow-text);
+        }
 
-            <div class="col-md-7 ps-4">
-                <form action="/admin/ml/predict" method="POST" class="row g-2">
-                    <label class="fw-bold mb-2 text-uppercase w-100">2. Run Demand Prediction</label>
-                    <div class="col-md-3"><select name="day" class="form-select rounded-0 border-dark"><option>Mon</option><option>Tue</option><option>Wed</option><option>Thu</option><option>Fri</option><option>Sat</option><option>Sun</option></select></div>
-                    <div class="col-md-3"><select name="time" class="form-select rounded-0 border-dark"><option>Breakfast</option><option>Lunch</option><option>Dinner</option></select></div>
-                    <div class="col-md-3"><input type="text" name="itemName" placeholder="Item (e.g. Rice)" class="form-control rounded-0 border-dark" required></div>
-                    <div class="col-md-3"><input type="number" name="price" placeholder="Price (₹)" class="form-control rounded-0 border-dark" required></div>
-                    <div class="col-md-4"><input type="number" name="avgSales" placeholder="Avg Daily Sales" class="form-control rounded-0 border-dark" required></div>
-                    <div class="col-md-4"><select name="event" class="form-select rounded-0 border-dark"><option value="No">Event: No</option><option value="Yes">Event: Yes</option></select></div>
-                    <div class="col-md-4">
-                        <button class="btn btn-primary rounded-0 w-100 fw-bold border-dark border-2" <%= !isModelTrained ? 'disabled' : '' %>>
-                            PREDICT
-                        </button>
-                    </div>
-                </form>
+        /* Admin Cards */
+        .admin-card {
+            background-color: var(--shadow-card);
+            border-radius: 1rem;
+            border: 1px solid var(--shadow-border);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+            margin-bottom: 2rem;
+        }
+
+        .admin-header-bg {
+            background: linear-gradient(135deg, #1f2937, #111827);
+            border-bottom: 1px solid var(--shadow-border);
+        }
+
+        .ai-header-bg {
+            background: linear-gradient(135deg, #1e3a8a, #111827);
+            border-bottom: 1px solid var(--ai-accent);
+        }
+
+        /* Forms & Inputs - FIXED FOR VISIBILITY */
+        .form-control,
+        .form-select,
+        .input-group-text {
+            background-color: rgba(0, 0, 0, 0.4) !important;
+            border: 1px solid var(--shadow-border) !important;
+            color: #ffffff !important;
+            /* Force white text */
+        }
+
+        .form-control:focus,
+        .form-select:focus {
+            background-color: rgba(0, 0, 0, 0.6) !important;
+            box-shadow: 0 0 0 0.25rem rgba(220, 38, 38, 0.25) !important;
+            border-color: var(--admin-accent) !important;
+            color: #ffffff !important;
+        }
+
+        /* Fix invisible placeholders */
+        .form-control::placeholder {
+            color: rgba(255, 255, 255, 0.6) !important;
+            opacity: 1;
+        }
+
+        /* Fix dropdown menu text */
+        .form-select option {
+            background-color: #1f2937 !important;
+            color: #ffffff !important;
+        }
+
+        .ai-input:focus {
+            box-shadow: 0 0 0 0.25rem rgba(59, 130, 246, 0.25) !important;
+            border-color: var(--ai-accent) !important;
+        }
+
+        /* Tables - FIXED FOR VISIBILITY */
+        .table-custom {
+            color: #ffffff !important;
+            /* Force table text to white */
+            --bs-table-bg: transparent;
+            --bs-table-hover-bg: rgba(255, 255, 255, 0.05);
+        }
+
+        .table-custom thead th {
+            background-color: rgba(0, 0, 0, 0.5);
+            color: var(--shadow-muted) !important;
+            border-bottom: 1px solid var(--shadow-border);
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            letter-spacing: 0.5px;
+        }
+
+        .table-custom td {
+            vertical-align: middle;
+            border-bottom: 1px solid var(--shadow-border);
+            color: #ffffff !important;
+        }
+
+        /* Buttons */
+        .btn-admin {
+            background-color: var(--admin-accent);
+            border-color: var(--admin-accent);
+            color: white;
+        }
+
+        .btn-admin:hover {
+            background-color: var(--admin-accent-hover);
+            color: white;
+        }
+
+        .btn-ai {
+            background-color: var(--ai-accent);
+            border-color: var(--ai-accent);
+            color: white;
+        }
+
+        .btn-ai:hover {
+            background-color: #2563eb;
+            color: white;
+        }
+
+        /* List Groups */
+        .list-group-item {
+            background-color: transparent;
+            color: #ffffff !important;
+            border: 1px solid var(--shadow-border);
+        }
+
+        /* Badges */
+        .badge-status {
+            padding: 0.5em 0.8em;
+            border-radius: 6px;
+            letter-spacing: 0.5px;
+            font-weight: 600;
+        }
+
+        .text-success-custom {
+            color: #34d399 !important;
+        }
+
+        /* Make muted text slightly brighter */
+        .text-muted {
+            color: var(--shadow-muted) !important;
+        }
+    </style>
+
+    <div class="container-fluid py-3 mb-5">
+
+        <div class="d-flex align-items-center justify-content-between mb-4 pb-3 border-bottom"
+            style="border-color: var(--shadow-border) !important;">
+            <div class="d-flex align-items-center">
+                <i class="fa-solid fa-server fa-2x me-3" style="color: var(--admin-accent);"></i>
+                <h2 class="mb-0 fw-bold text-white">System Operations</h2>
             </div>
         </div>
 
-        <% if(prediction) { %>
-            <div class="alert alert-warning mt-4 mb-0 rounded-0 border-dark border-2 text-center shadow-sm">
-                <h5 class="text-uppercase mb-1">Estimated Demand for <%= prediction.item %></h5>
-                <div class="display-4 fw-bold text-dark"><%= prediction.demand %> Plates</div>
-                <small class="text-muted fw-bold">(Includes a 10% safety buffer for stock security)</small>
+        <div class="card admin-card">
+            <div class="card-header ai-header-bg text-white d-flex justify-content-between align-items-center py-3">
+                <h5 class="mb-0 fw-bold d-flex align-items-center">
+                    <i class="fa-solid fa-brain me-2 text-info"></i> AI Demand Predictor (FNN)
+                </h5>
+
+                <% if(isModelTrained) { %>
+                    <span class="badge bg-success bg-opacity-25 text-success-custom border border-success badge-status">
+                        <i class="fa-solid fa-circle-check me-1"></i> MODEL ONLINE
+                    </span>
+                    <% } else { %>
+                        <span class="badge bg-danger bg-opacity-25 text-danger border border-danger badge-status">
+                            <i class="fa-solid fa-circle-xmark me-1"></i> OFFLINE (NEEDS DATA)
+                        </span>
+                        <% } %>
             </div>
-        <% } %>
-    </div>
-</div>
-<div class="row">
-    <div class="col-md-8">
-        <div class="card rounded-0 border-dark border-2 mb-4">
-            <div class="card-header bg-dark text-white rounded-0 d-flex justify-content-between align-items-center">
-                <h5 class="mb-0">Live Orders</h5>
-                <form action="/admin/order/clear" method="POST"><button class="btn btn-sm btn-danger rounded-0">Clear All</button></form>
-            </div>
-            <div class="table-responsive">
-                <table class="table table-bordered table-hover m-0 align-middle">
-                    <thead class="table-light"><tr><th>Student</th><th>Order Details</th><th>Status</th><th>Actions</th></tr></thead>
-                    <tbody id="live-orders-table">
-                        <% orders.forEach(o => { %>
-                            <tr>
-                                <td><strong><%= o.studentName %></strong><br><small><%= o.year %> | <%= o.branch %></small><br><small>Reg: <%= o.regNo %></small></td>
-                                <td><ul class="mb-0 small ps-3"><% o.items.forEach(i => { %><li><%= i.quantity %>x <%= i.itemName %></li><% }) %></ul><div class="mt-1 fw-bold">₹<%= o.totalAmount %></div></td>
-                                <td><span class="badge <%= o.status==='Fulfilled'?'bg-success':'bg-warning text-dark'%> rounded-0 w-100"><%= o.status %></span></td>
-                                <td>
-                                    <div class="d-flex gap-1">
-                                        <% if(o.status !== 'Fulfilled') { %><form action="/admin/order/fulfill/<%= o._id %>" method="POST"><button class="btn btn-sm btn-success rounded-0">✓</button></form><% } %>
-                                        <form action="/admin/order/delete/<%= o._id %>" method="POST"><button class="btn btn-sm btn-danger rounded-0">X</button></form>
+
+            <div class="card-body p-4">
+                <% if(error) { %>
+                    <div
+                        class="alert alert-danger d-flex align-items-center rounded-3 shadow-sm border-0 bg-dark text-danger">
+                        <i class="fa-solid fa-triangle-exclamation me-2"></i>
+                        <%= error %>
+                    </div>
+                    <% } %>
+
+                        <% if(isModelTrained && !prediction) { %>
+                            <div
+                                class="alert alert-success d-flex align-items-center rounded-3 shadow-sm border-0 bg-dark text-success-custom mb-4">
+                                <i class="fa-solid fa-microchip me-2"></i> AI Model successfully trained and loaded into
+                                server memory! Ready for predictions.
+                            </div>
+                            <% } %>
+
+                                <div class="row g-4">
+                                    <div class="col-lg-5 border-end border-secondary pe-lg-4"
+                                        style="border-color: var(--shadow-border) !important;">
+                                        <form action="/admin/ml/train" method="POST" enctype="multipart/form-data"
+                                            class="h-100 d-flex flex-column justify-content-center">
+                                            <label class="fw-bold mb-3 text-uppercase text-muted small">
+                                                <i class="fa-solid fa-database me-1"></i> 1. Upload Training Data (.xlsx
+                                                / .csv)
+                                            </label>
+                                            <div class="input-group mb-2 shadow-sm">
+                                                <input type="file" name="dataset" class="form-control ai-input"
+                                                    required>
+                                                <button class="btn btn-ai fw-bold px-4">
+                                                    <i class="fa-solid fa-gears"></i> TRAIN
+                                                </button>
+                                            </div>
+                                            <small class="text-muted"><i class="fa-solid fa-circle-info me-1"></i>
+                                                Upload the latest canteen sales data to teach the AI.</small>
+                                        </form>
                                     </div>
-                                </td>
-                            </tr>
-                        <% }) %>
-                    </tbody>
-                </table>
+
+                                    <div class="col-lg-7 ps-lg-4">
+                                        <form action="/admin/ml/predict" method="POST" class="row g-3">
+                                            <label class="fw-bold text-uppercase text-muted small w-100 mb-0">
+                                                <i class="fa-solid fa-wand-magic-sparkles me-1"></i> 2. Run Demand
+                                                Prediction
+                                            </label>
+
+                                            <div class="col-md-3">
+                                                <select name="day" class="form-select ai-input">
+                                                    <option>Mon</option>
+                                                    <option>Tue</option>
+                                                    <option>Wed</option>
+                                                    <option>Thu</option>
+                                                    <option>Fri</option>
+                                                    <option>Sat</option>
+                                                    <option>Sun</option>
+                                                </select>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <select name="time" class="form-select ai-input">
+                                                    <option>Breakfast</option>
+                                                    <option>Lunch</option>
+                                                    <option>Dinner</option>
+                                                </select>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <input type="text" name="itemName" placeholder="Item (e.g. Rice)"
+                                                    class="form-control ai-input" required>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <input type="number" name="price" placeholder="Price (₹)"
+                                                    class="form-control ai-input" required>
+                                            </div>
+
+                                            <div class="col-md-4">
+                                                <input type="number" name="avgSales" placeholder="Avg Daily Sales"
+                                                    class="form-control ai-input" required>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <select name="event" class="form-select ai-input">
+                                                    <option value="No">Event: No</option>
+                                                    <option value="Yes">Event: Yes</option>
+                                                </select>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <button
+                                                    class="btn btn-ai w-100 fw-bold shadow-sm d-flex justify-content-center align-items-center gap-2"
+                                                    <%=!isModelTrained ? 'disabled' : '' %>>
+                                                    <i class="fa-solid fa-chart-pie"></i> PREDICT
+                                                </button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+
+                                <% if(prediction) { %>
+                                    <div class="mt-4 p-4 rounded-3 text-center"
+                                        style="background: rgba(59, 130, 246, 0.1); border: 1px solid rgba(59, 130, 246, 0.3);">
+                                        <h5 class="text-uppercase mb-2 text-info"><i
+                                                class="fa-solid fa-chart-column me-2"></i>Estimated Demand for <%=
+                                                prediction.item %>
+                                        </h5>
+                                        <div class="display-4 fw-bold text-white mb-2">
+                                            <%= prediction.demand %> <span class="fs-4 text-muted">Plates</span>
+                                        </div>
+                                        <small class="text-info opacity-75 fw-bold"><i
+                                                class="fa-solid fa-shield-halved me-1"></i> Includes a 10% safety buffer
+                                            for stock security</small>
+                                    </div>
+                                    <% } %>
+            </div>
+        </div>
+
+        <div class="row g-4">
+
+            <div class="col-lg-8">
+                <div class="card admin-card h-100">
+                    <div class="card-header admin-header-bg d-flex justify-content-between align-items-center py-3">
+                        <h5 class="mb-0 fw-bold text-white"><i
+                                class="fa-solid fa-satellite-dish me-2 text-danger"></i>Live Orders</h5>
+                        <form action="/admin/order/clear" method="POST" class="m-0">
+                            <button class="btn btn-sm btn-outline-danger shadow-sm fw-bold">
+                                <i class="fa-solid fa-dumpster me-1"></i> Clear All
+                            </button>
+                        </form>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-hover table-custom m-0 align-middle">
+                            <thead>
+                                <tr>
+                                    <th class="ps-4">Student</th>
+                                    <th>Order Details</th>
+                                    <th>Status</th>
+                                    <th class="pe-4 text-end">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="live-orders-table">
+                                <% orders.forEach(o=> { %>
+                                    <tr>
+                                        <td class="ps-4">
+                                            <strong class="text-white">
+                                                <%= o.studentName %>
+                                            </strong><br>
+                                            <small class="text-muted">
+                                                <%= o.year %> | <%= o.branch %>
+                                            </small><br>
+                                            <small class="text-muted">Reg: <%= o.regNo %></small>
+                                        </td>
+                                        <td>
+                                            <div class="bg-dark bg-opacity-50 p-2 rounded-2 border border-secondary"
+                                                style="border-color: var(--shadow-border) !important;">
+                                                <ul class="mb-0 small ps-3 text-white">
+                                                    <% o.items.forEach(i=> { %>
+                                                        <li><span class="text-danger fw-bold">
+                                                                <%= i.quantity %>x
+                                                            </span>
+                                                            <%= i.itemName %>
+                                                        </li>
+                                                        <% }) %>
+                                                </ul>
+                                            </div>
+                                            <div class="mt-2 fw-bold text-success-custom fs-5">₹<%= o.totalAmount %>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <span
+                                                class="badge <%= o.status==='Fulfilled'?'bg-success text-white':'bg-warning text-dark'%> rounded-pill px-3 shadow-sm">
+                                                <%= o.status %>
+                                            </span>
+                                        </td>
+                                        <td class="pe-4">
+                                            <div class="d-flex justify-content-end gap-2">
+                                                <% if(o.status !=='Fulfilled' ) { %>
+                                                    <form action="/admin/order/fulfill/<%= o._id %>" method="POST"
+                                                        class="m-0">
+                                                        <button class="btn btn-sm btn-success shadow-sm rounded-2"
+                                                            title="Mark as Fulfilled"><i
+                                                                class="fa-solid fa-check"></i></button>
+                                                    </form>
+                                                    <% } %>
+                                                        <form action="/admin/order/delete/<%= o._id %>" method="POST"
+                                                            class="m-0">
+                                                            <button class="btn btn-sm btn-danger shadow-sm rounded-2"
+                                                                title="Delete Order"><i
+                                                                    class="fa-solid fa-trash-can"></i></button>
+                                                        </form>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <% }) %>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4">
+                <div class="card admin-card h-100">
+                    <div class="card-header admin-header-bg py-3">
+                        <h5 class="mb-0 fw-bold text-white"><i class="fa-solid fa-burger me-2 text-danger"></i>Menu
+                            Items</h5>
+                    </div>
+                    <div class="card-body">
+                        <form action="/admin/product/add" method="POST"
+                            class="mb-4 bg-dark bg-opacity-25 p-3 rounded-3 border border-secondary"
+                            style="border-color: var(--shadow-border) !important;">
+                            <label class="small text-muted text-uppercase fw-bold mb-2">Add New Item</label>
+                            <input type="text" name="name" placeholder="Item Name" class="form-control mb-2" required>
+                            <input type="number" name="price" placeholder="Price (₹)" class="form-control mb-2"
+                                required>
+                            <select name="isAvailable" class="form-select mb-3">
+                                <option value="true">Available</option>
+                                <option value="false">Unavailable</option>
+                            </select>
+                            <button class="btn btn-admin w-100 fw-bold shadow-sm"><i class="fa-solid fa-plus me-1"></i>
+                                ADD ITEM</button>
+                        </form>
+
+                        <label class="small text-muted text-uppercase fw-bold mb-2">Current Menu</label>
+                        <ul class="list-group shadow-sm">
+                            <% products.forEach(p=> { %>
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <strong class="text-white">
+                                            <%= p.name %>
+                                        </strong>
+                                        <span class="text-success-custom fw-bold ms-1">₹<%= p.price %></span>
+                                    </div>
+                                    <form action="/admin/product/delete/<%= p._id %>" method="POST" class="m-0">
+                                        <button class="btn btn-sm btn-outline-danger border-0"><i
+                                                class="fa-solid fa-xmark fs-5"></i></button>
+                                    </form>
+                                </li>
+                                <% }) %>
+                        </ul>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 
-    <div class="col-md-4">
-        <div class="card rounded-0 border-dark border-2 mb-4">
-            <div class="card-header bg-dark text-white rounded-0"><h5 class="mb-0">Menu Items</h5></div>
-            <div class="card-body">
-                <form action="/admin/product/add" method="POST" class="mb-4">
-                    <input type="text" name="name" placeholder="Item Name" class="form-control rounded-0 border-dark mb-2" required>
-                    <input type="number" name="price" placeholder="Price (₹)" class="form-control rounded-0 border-dark mb-2" required>
-                    <select name="isAvailable" class="form-select rounded-0 border-dark mb-2"><option value="true">Available</option><option value="false">Unavailable</option></select>
-                    <button class="btn btn-dark rounded-0 w-100 fw-bold">ADD ITEM</button>
-                </form>
-                <ul class="list-group rounded-0">
-                    <% products.forEach(p => { %>
-                        <li class="list-group-item d-flex justify-content-between align-items-center border-dark">
-                            <div><strong><%= p.name %></strong> (₹<%= p.price %>)</div>
-                            <form action="/admin/product/delete/<%= p._id %>" method="POST"><button class="btn btn-sm btn-outline-danger rounded-0">Del</button></form>
-                        </li>
-                    <% }) %>
-                </ul>
-            </div>
-        </div>
-    </div>
-</div>
-<script>
-    // Ask the server for new orders every 3000 milliseconds (3 seconds)
-    setInterval(fetchLiveOrders, 3000);
+    <script>
+        // Ask the server for new orders every 3000 milliseconds (3 seconds)
+        setInterval(fetchLiveOrders, 3000);
 
-    async function fetchLiveOrders() {
-        try {
-            const response = await fetch('/admin/api/orders');
-            const orders = await response.json();
-            
-            const tbody = document.getElementById('live-orders-table');
-            if (!tbody) return;
+        async function fetchLiveOrders() {
+            try {
+                const response = await fetch('/admin/api/orders');
+                const orders = await response.json();
 
-            let html = '';
+                const tbody = document.getElementById('live-orders-table');
+                if (!tbody) return;
 
-            // Loop through the JSON data and build the HTML rows
-            orders.forEach(o => {
-                // 1. Build the items list
-                let itemsHtml = '<ul class="mb-0 small ps-3">';
-                o.items.forEach(i => {
-                    itemsHtml += `<li>${i.quantity}x ${i.itemName}</li>`;
-                });
-                itemsHtml += `</ul><div class="mt-1 fw-bold">₹${o.totalAmount}</div>`;
+                let html = '';
 
-                // 2. Build the status badge
-                const badgeClass = o.status === 'Fulfilled' ? 'bg-success' : 'bg-warning text-dark';
-                const statusBadge = `<span class="badge ${badgeClass} rounded-0 w-100">${o.status}</span>`;
+                // Loop through the JSON data and build the HTML rows using the NEW Dark Theme layout
+                orders.forEach(o => {
 
-                // 3. Build the action buttons
-                let actionButtons = '<div class="d-flex gap-1">';
-                if (o.status !== 'Fulfilled') {
-                    actionButtons += `
-                        <form action="/admin/order/fulfill/${o._id}" method="POST">
-                            <button class="btn btn-sm btn-success rounded-0">✓</button>
+                    // 1. Build the items list HTML
+                    let itemsHtml = `
+                <div class="bg-dark bg-opacity-50 p-2 rounded-2 border border-secondary" style="border-color: var(--shadow-border) !important;">
+                    <ul class="mb-0 small ps-3 text-white">`;
+
+                    o.items.forEach(i => {
+                        itemsHtml += `<li><span class="text-danger fw-bold">${i.quantity}x</span> ${i.itemName}</li>`;
+                    });
+
+                    itemsHtml += `
+                    </ul>
+                </div>
+                <div class="mt-2 fw-bold text-success-custom fs-5">₹${o.totalAmount}</div>`;
+
+                    // 2. Build the status badge HTML
+                    const badgeClass = o.status === 'Fulfilled' ? 'bg-success text-white' : 'bg-warning text-dark';
+                    const statusBadge = `<span class="badge ${badgeClass} rounded-pill px-3 shadow-sm">${o.status}</span>`;
+
+                    // 3. Build the action buttons HTML
+                    let actionButtons = '<div class="d-flex justify-content-end gap-2">';
+                    if (o.status !== 'Fulfilled') {
+                        actionButtons += `
+                        <form action="/admin/order/fulfill/${o._id}" method="POST" class="m-0">
+                            <button class="btn btn-sm btn-success shadow-sm rounded-2" title="Mark as Fulfilled">
+                                <i class="fa-solid fa-check"></i>
+                            </button>
                         </form>`;
-                }
-                actionButtons += `
-                    <form action="/admin/order/delete/${o._id}" method="POST">
-                        <button class="btn btn-sm btn-danger rounded-0">X</button>
+                    }
+                    actionButtons += `
+                    <form action="/admin/order/delete/${o._id}" method="POST" class="m-0">
+                        <button class="btn btn-sm btn-danger shadow-sm rounded-2" title="Delete Order">
+                            <i class="fa-solid fa-trash-can"></i>
+                        </button>
                     </form>
                 </div>`;
 
-                // 4. Put it all together in a table row
-                html += `
+                    // 4. Put it all together in a table row
+                    html += `
                     <tr>
-                        <td>
-                            <strong>${o.studentName}</strong><br>
-                            <small>${o.year} | ${o.branch}</small><br>
-                            <small>Reg: ${o.regNo}</small>
+                        <td class="ps-4">
+                            <strong class="text-white">${o.studentName}</strong><br>
+                            <small class="text-muted">${o.year} | ${o.branch}</small><br>
+                            <small class="text-muted">Reg: ${o.regNo}</small>
                         </td>
                         <td>${itemsHtml}</td>
                         <td>${statusBadge}</td>
-                        <td>${actionButtons}</td>
+                        <td class="pe-4">${actionButtons}</td>
                     </tr>
                 `;
-            });
+                });
 
-            // Replace the old table content with the freshly fetched data
-            tbody.innerHTML = html;
+                // Replace the old table content with the freshly fetched data
+                tbody.innerHTML = html;
 
-        } catch (error) {
-            console.error("Error fetching live orders:", error);
+            } catch (error) {
+                console.error("Error fetching live orders:", error);
+            }
         }
-    }
-</script>
+    </script>
 
-<%- include('../layouts/footer') %>
+    <%- include('../layouts/footer') %>

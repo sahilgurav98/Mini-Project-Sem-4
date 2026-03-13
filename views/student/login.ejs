@@ -1,39 +1,186 @@
 <%- include('../layouts/header') %>
-<div class="row justify-content-center mt-5">
-    <div class="col-md-5">
-        <div class="card rounded-0 shadow-lg border-dark border-2">
-            <div class="card-header bg-white border-bottom border-dark border-2 py-4 text-center">
-                <h3 class="mb-0 fw-bold">STUDENT PORTAL</h3>
-                <small class="text-muted text-uppercase">Access your canteen account</small>
-            </div>
-            <div class="card-body p-4 bg-light">
-                <% if(error) { %> 
-                    <div class="alert alert-danger rounded-0 border-dark fw-bold"><%= error %></div> 
-                <% } %>
-                
-                <form action="/auth/login/student" method="POST">
-                    <div class="mb-3">
-                        <label class="fw-bold small text-uppercase">Registered Email</label>
-                        <input type="email" name="email" class="form-control form-control-lg rounded-0 border-dark" required>
+
+    <style>
+        :root {
+            --shadow-accent: #7c3aed;
+            /* Electric Purple */
+            --shadow-accent-hover: #6d28d9;
+            --shadow-bg: #0b0f19;
+            /* Very dark blue/black */
+            --shadow-card: #111827;
+            /* Dark gray */
+            --shadow-text: #f3f4f6;
+            --shadow-muted: #9ca3af;
+        }
+
+        /* Target the body to apply the dark background to the whole page */
+        body {
+            background-color: var(--shadow-bg);
+            color: var(--shadow-text);
+        }
+
+        .login-wrapper {
+            min-height: 80vh;
+            display: flex;
+            align-items: center;
+        }
+
+        .student-card {
+            background-color: var(--shadow-card);
+            border-radius: 1rem;
+            border: 1px solid rgba(255, 255, 255, 0.05) !important;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5) !important;
+        }
+
+        .student-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 35px rgba(124, 58, 237, 0.15) !important;
+        }
+
+        /* Customizing the Header Gradient */
+        .custom-header-bg {
+            background: linear-gradient(135deg, #4c1d95, #7c3aed);
+        }
+
+        /* Customizing Bootstrap Buttons */
+        .btn-primary {
+            background-color: var(--shadow-accent);
+            border-color: var(--shadow-accent);
+            color: white;
+        }
+
+        .btn-primary:hover,
+        .btn-primary:focus {
+            background-color: var(--shadow-accent-hover);
+            border-color: var(--shadow-accent-hover);
+        }
+
+        .btn-outline-primary {
+            color: var(--shadow-accent);
+            border-color: var(--shadow-accent);
+        }
+
+        .btn-outline-primary:hover {
+            background-color: var(--shadow-accent);
+            color: white;
+        }
+
+        /* Customizing Inputs for Dark Mode */
+        .form-control,
+        .input-group-text {
+            background-color: rgba(255, 255, 255, 0.03);
+            border-color: rgba(255, 255, 255, 0.1);
+            color: var(--shadow-text);
+        }
+
+        .form-control:focus {
+            background-color: rgba(255, 255, 255, 0.05);
+            box-shadow: 0 0 0 0.25rem rgba(124, 58, 237, 0.25);
+            border-color: var(--shadow-accent);
+            color: white;
+        }
+
+        .form-control::placeholder {
+            color: rgba(156, 163, 175, 0.5);
+            /* Faded placeholder */
+        }
+
+        .input-group-text i {
+            color: var(--shadow-muted);
+        }
+
+        .input-group:focus-within .input-group-text i {
+            color: var(--shadow-accent) !important;
+            transition: color 0.3s ease;
+        }
+
+        .text-muted {
+            color: var(--shadow-muted) !important;
+        }
+
+        /* Subtle divider */
+        hr.custom-divider {
+            border-color: rgba(255, 255, 255, 0.1);
+        }
+    </style>
+
+    <div class="container login-wrapper my-5">
+        <div class="row justify-content-center w-100">
+            <div class="col-12 col-sm-10 col-md-8 col-lg-5 col-xl-4">
+                <div class="card student-card border-0 overflow-hidden">
+
+                    <div class="card-header custom-header-bg text-white border-0 py-4 text-center">
+                        <i class="fa-solid fa-user-graduate fa-3x mb-3"></i>
+                        <h3 class="mb-0 fw-bold">STUDENT PORTAL</h3>
+                        <small class="text-white-50 text-uppercase" style="letter-spacing: 1px;">Access your canteen
+                            account</small>
                     </div>
-                    
-                    <div class="mb-4">
-                        <label class="fw-bold small text-uppercase">Password</label>
-                        <input type="password" name="password" class="form-control form-control-lg rounded-0 border-dark" required>
+
+                    <div class="card-body p-4 p-md-5">
+
+                        <% if(error) { %>
+                            <div class="alert alert-danger d-flex align-items-center rounded-3 fw-bold shadow-sm border-0"
+                                role="alert">
+                                <i class="fa-solid fa-circle-exclamation me-2 fs-5"></i>
+                                <div>
+                                    <%= error %>
+                                </div>
+                            </div>
+                            <% } %>
+
+                                <form action="/auth/login/student" method="POST">
+
+                                    <div class="mb-4">
+                                        <label class="fw-bold small text-uppercase text-muted mb-2">Registered
+                                            Email</label>
+                                        <div class="input-group input-group-lg shadow-sm">
+                                            <span class="input-group-text border-end-0"><i
+                                                    class="fa-solid fa-envelope"></i></span>
+                                            <input type="email" name="email" class="form-control border-start-0 ps-0"
+                                                placeholder="student@example.com" required>
+                                        </div>
+                                    </div>
+
+                                    <div class="mb-5">
+                                        <label class="fw-bold small text-uppercase text-muted mb-2">Password</label>
+                                        <div class="input-group input-group-lg shadow-sm">
+                                            <span class="input-group-text border-end-0"><i
+                                                    class="fa-solid fa-lock"></i></span>
+                                            <input type="password" name="password"
+                                                class="form-control border-start-0 ps-0" placeholder="••••••••"
+                                                required>
+                                        </div>
+                                    </div>
+
+                                    <button type="submit"
+                                        class="btn btn-primary btn-lg rounded-3 w-100 fw-bold shadow-sm d-flex justify-content-center align-items-center gap-2">
+                                        <span>LOGIN</span>
+                                        <i class="fa-solid fa-arrow-right-to-bracket"></i>
+                                    </button>
+                                </form>
+
+                                <hr class="my-4 custom-divider">
+
+                                <div class="text-center mb-3">
+                                    <a href="/auth/signup/student"
+                                        class="btn btn-outline-primary rounded-3 w-100 fw-bold d-flex justify-content-center align-items-center gap-2">
+                                        <i class="fa-solid fa-user-plus"></i>
+                                        <span>CREATE NEW ACCOUNT</span>
+                                    </a>
+                                </div>
+
+                                <div class="mt-4 text-center">
+                                    <a href="/auth/login/admin"
+                                        class="text-muted small text-decoration-none fw-bold hover-white">
+                                        <i class="fa-solid fa-shield-halved me-1"></i> System Administrator Access
+                                        &rarr;
+                                    </a>
+                                </div>
                     </div>
-                    
-                    <button type="submit" class="btn btn-primary rounded-0 w-100 fw-bold fs-5 border-dark border-2">LOGIN</button>
-                </form>
-                
-                <div class="mt-4 text-center">
-                    <a href="/auth/signup/student" class="btn btn-outline-dark rounded-0 w-100 fw-bold">CREATE NEW ACCOUNT</a>
-                </div>
-                
-                <div class="mt-4 text-center">
-                    <a href="/auth/login/admin" class="text-secondary small text-decoration-none fw-bold">System Administrator Access &rarr;</a>
                 </div>
             </div>
         </div>
     </div>
-</div>
-<%- include('../layouts/footer') %>
+
+    <%- include('../layouts/footer') %>

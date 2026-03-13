@@ -1,12 +1,12 @@
 import express from 'express';
-import { 
-    renderStudentLogin, 
-    renderStudentSignup, 
-    renderAdminLogin, 
-    studentSignup, 
-    studentLogin, 
-    adminLogin, 
-    logout 
+import {
+    renderStudentLogin,
+    renderStudentSignup,
+    renderAdminLogin,
+    studentSignup,
+    studentLogin,
+    adminLogin,
+    logout
 } from '../controllers/authController.js';
 
 const router = express.Router();

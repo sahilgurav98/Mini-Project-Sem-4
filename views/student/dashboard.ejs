@@ -1,49 +1,276 @@
 <%- include('../layouts/header') %>
-<h2 class="mb-4 border-bottom border-dark border-2 pb-2">Student Dashboard</h2>
-<div class="row">
-    <div class="col-md-8">
-        <div class="card rounded-0 border-dark border-2 mb-4">
-            <div class="card-header bg-dark text-white rounded-0">Place New Order</div>
-            <div class="card-body">
-                <table class="table table-bordered align-middle">
-                    <thead class="table-dark"><tr><th>Item</th><th>Price</th><th>Quantity</th></tr></thead>
-                    <tbody id="menu-items">
-                        <% products.forEach(p => { %>
-                            <tr>
-                                <td class="item-name fw-bold"><%= p.name %></td>
-                                <td>₹<span class="item-price"><%= p.price %></span></td>
-                                <td><input type="number" class="form-control rounded-0 border-dark item-qty" value="0" min="0" onchange="calcTotal()"></td>
-                            </tr>
-                        <% }) %>
-                    </tbody>
-                </table>
-                <div class="d-flex justify-content-between align-items-center bg-light p-3 border border-dark border-2">
-                    <h4 class="m-0">Total: ₹<span id="grandTotal">0</span></h4>
-                    <button class="btn btn-dark rounded-0 px-4 fw-bold" onclick="submitOrder()">CONFIRM ORDER</button>
+
+    <style>
+        /* Consistent Dark Theme Palette - BRIGHTENED FOR VISIBILITY */
+        :root {
+            --shadow-accent: #7c3aed;
+            /* Electric Purple */
+            --shadow-accent-hover: #6d28d9;
+            --shadow-bg: #0b0f19;
+            /* Very dark blue/black */
+            --shadow-card: #111827;
+            /* Dark gray */
+            --shadow-text: #f8fafc;
+            /* Made text brighter white */
+            --shadow-muted: #cbd5e1;
+            /* Lightened muted text for better contrast */
+            --shadow-border: rgba(255, 255, 255, 0.15);
+            /* Slightly more visible borders */
+        }
+
+        body {
+            background-color: var(--shadow-bg);
+            color: var(--shadow-text) !important;
+        }
+
+        /* Dashboard Specific Styles */
+        .dashboard-card {
+            background-color: var(--shadow-card);
+            border-radius: 1rem;
+            border: 1px solid var(--shadow-border) !important;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            overflow: hidden;
+        }
+
+        .custom-header-bg {
+            background: linear-gradient(135deg, #4c1d95, #7c3aed);
+            color: white !important;
+            border-bottom: none;
+        }
+
+        .secondary-header {
+            background-color: rgba(255, 255, 255, 0.03);
+            color: var(--shadow-text) !important;
+            border-bottom: 1px solid var(--shadow-border);
+        }
+
+        /* Table Styles for Dark Mode - FIXED FOR VISIBILITY */
+        .table-custom {
+            color: var(--shadow-text) !important;
+            --bs-table-bg: transparent;
+            --bs-table-hover-bg: rgba(124, 58, 237, 0.1);
+        }
+
+        .table-custom thead th {
+            background-color: rgba(0, 0, 0, 0.3);
+            color: var(--shadow-muted) !important;
+            /* Forced light gray */
+            border-bottom: 1px solid var(--shadow-border);
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+
+        .table-custom td {
+            vertical-align: middle;
+            border-bottom: 1px solid var(--shadow-border);
+            color: #ffffff !important;
+            /* Force pure white text */
+        }
+
+        /* Quantity Input Styling */
+        .qty-input {
+            max-width: 90px;
+            text-align: center;
+            background-color: rgba(0, 0, 0, 0.4) !important;
+            border: 1px solid rgba(255, 255, 255, 0.2) !important;
+            color: #ffffff !important;
+            /* Forced white text */
+        }
+
+        .qty-input:focus {
+            background-color: rgba(0, 0, 0, 0.6) !important;
+            box-shadow: 0 0 0 0.25rem rgba(124, 58, 237, 0.25);
+            border-color: var(--shadow-accent) !important;
+            color: #ffffff !important;
+        }
+
+        /* Order History Scrollbar */
+        .order-history-list {
+            max-height: 550px;
+            overflow-y: auto;
+            background-color: var(--shadow-card);
+        }
+
+        .order-history-list::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .order-history-list::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.2);
+        }
+
+        .order-history-list::-webkit-scrollbar-thumb {
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+        }
+
+        .order-history-list::-webkit-scrollbar-thumb:hover {
+            background-color: rgba(124, 58, 237, 0.5);
+        }
+
+        /* List group updates - FIXED FOR VISIBILITY */
+        .list-group-item {
+            background-color: transparent !important;
+            color: var(--shadow-text) !important;
+            border-bottom: 1px solid var(--shadow-border) !important;
+        }
+
+        /* Buttons */
+        .btn-primary {
+            background-color: var(--shadow-accent);
+            border-color: var(--shadow-accent);
+            color: white;
+        }
+
+        .btn-primary:hover,
+        .btn-primary:focus {
+            background-color: var(--shadow-accent-hover);
+            border-color: var(--shadow-accent-hover);
+            color: white;
+        }
+
+        /* Utilities */
+        .badge-status {
+            font-size: 0.85em;
+            padding: 0.5em 0.8em;
+            border-radius: 20px;
+            letter-spacing: 0.5px;
+        }
+
+        .text-success {
+            color: #34d399 !important;
+        }
+
+        /* Force muted text to be readable */
+        .text-muted {
+            color: var(--shadow-muted) !important;
+        }
+
+        .bg-light-dark {
+            background-color: rgba(0, 0, 0, 0.4) !important;
+            border: 1px solid var(--shadow-border) !important;
+        }
+
+        /* Ensure history item text is bright */
+        .history-item-text {
+            color: #e2e8f0 !important;
+        }
+    </style>
+
+    <div class="container-fluid py-4 mb-5">
+
+        <div class="d-flex align-items-center mb-4 pb-3 border-bottom"
+            style="border-color: var(--shadow-border) !important;">
+            <i class="fa-solid fa-house-user fa-2x me-3" style="color: var(--shadow-accent);"></i>
+            <h2 class="mb-0 fw-bold text-white">Student Dashboard</h2>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-lg-8">
+                <div class="card dashboard-card h-100">
+                    <div class="card-header custom-header-bg d-flex align-items-center py-3 py-4">
+                        <i class="fa-solid fa-utensils me-3 fs-5"></i>
+                        <h5 class="mb-0 fw-bold text-white">Place New Order</h5>
+                    </div>
+
+                    <div class="card-body p-0 d-flex flex-column">
+                        <div class="table-responsive flex-grow-1">
+                            <table class="table table-hover table-custom mb-0">
+                                <thead class="text-uppercase small">
+                                    <tr>
+                                        <th class="ps-4 py-3">Item</th>
+                                        <th class="py-3">Price</th>
+                                        <th class="pe-4 py-3 text-end">Quantity</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="menu-items">
+                                    <% products.forEach(p=> { %>
+                                        <tr>
+                                            <td class="item-name fw-bold ps-4">
+                                                <%= p.name %>
+                                            </td>
+                                            <td class="text-success fw-bold">₹<span class="item-price">
+                                                    <%= p.price %>
+                                                </span></td>
+                                            <td class="pe-4 d-flex justify-content-end">
+                                                <input type="number"
+                                                    class="form-control form-control-sm qty-input rounded-3 shadow-sm item-qty"
+                                                    value="0" min="0" onchange="calcTotal()">
+                                            </td>
+                                        </tr>
+                                        <% }) %>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="p-4 d-flex flex-column flex-sm-row justify-content-between align-items-center gap-3"
+                            style="background-color: rgba(0,0,0,0.3); border-top: 1px solid var(--shadow-border);">
+                            <div class="d-flex align-items-center">
+                                <h5 class="m-0 text-muted me-2 text-uppercase fw-bold">Total:</h5>
+                                <h3 class="m-0 fw-bold" style="color: var(--shadow-accent);">₹<span
+                                        id="grandTotal">0</span></h3>
+                            </div>
+                            <button
+                                class="btn btn-primary btn-lg rounded-3 px-4 fw-bold shadow-lg d-flex justify-content-center align-items-center gap-2 w-sm-100"
+                                onclick="submitOrder()">
+                                <i class="fa-solid fa-cart-arrow-down"></i>
+                                <span>CONFIRM ORDER</span>
+                            </button>
+                        </div>
+
+                        <div id="order-msg" class="px-4 pb-2"></div>
+                    </div>
                 </div>
-                <div id="order-msg" class="mt-2"></div>
+            </div>
+
+            <div class="col-lg-4">
+                <div class="card dashboard-card h-100">
+                    <div class="card-header secondary-header d-flex align-items-center p-3 py-4">
+                        <i class="fa-solid fa-clock-rotate-left me-2 text-muted fs-5"></i>
+                        <h5 class="mb-0 fw-bold text-white">My Orders</h5>
+                    </div>
+
+                    <div class="card-body p-0 order-history-list">
+                        <ul class="list-group list-group-flush rounded-0">
+                            <% orders.forEach(o=> { %>
+                                <li class="list-group-item p-4">
+
+                                    <div class="d-flex justify-content-between align-items-start mb-2">
+                                        <span
+                                            class="badge badge-status <%= o.status==='Fulfilled' ? 'bg-success text-white' : 'bg-warning text-dark' %> shadow-sm">
+                                            <%= o.status %>
+                                        </span>
+                                        <strong class="fs-5" style="color: var(--shadow-accent);">₹<%= o.totalAmount %>
+                                        </strong>
+                                    </div>
+
+                                    <small class="text-muted d-block mb-3 fw-medium">
+                                        <i class="fa-regular fa-calendar-days me-1"></i>
+                                        <%= o.orderTime.toLocaleString() %>
+                                    </small>
+
+                                    <div class="bg-light-dark rounded-3 p-3 border">
+                                        <ul class="mb-0 ps-3 small text-light">
+                                            <% o.items.forEach(i=> { %>
+                                                <li class="mb-1">
+                                                    <span class="fw-bold" style="color: var(--shadow-accent);">
+                                                        <%= i.quantity %>x
+                                                    </span>
+                                                    <span class="ms-1 history-item-text">
+                                                        <%= i.itemName %>
+                                                    </span>
+                                                </li>
+                                                <% }) %>
+                                        </ul>
+                                    </div>
+
+                                </li>
+                                <% }) %>
+                        </ul>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
-    <div class="col-md-4">
-        <div class="card rounded-0 border-dark border-2">
-            <div class="card-header bg-secondary text-white rounded-0">My Orders</div>
-            <div class="card-body p-0" style="max-height: 400px; overflow-y:auto;">
-                <ul class="list-group rounded-0">
-                    <% orders.forEach(o => { %>
-                        <li class="list-group-item border-bottom border-dark">
-                            <strong>Status:</strong> 
-                            <span class="badge <%= o.status==='Fulfilled'?'bg-success':'bg-warning text-dark'%> rounded-0"><%= o.status %></span><br>
-                            <small class="text-muted"><%= o.orderTime.toLocaleString() %></small>
-                            <ul class="mb-1 mt-1 ps-3 small">
-                                <% o.items.forEach(i => { %> <li><%= i.quantity %>x <%= i.itemName %></li> <% }) %>
-                            </ul>
-                            <strong>Total: ₹<%= o.totalAmount %></strong>
-                        </li>
-                    <% }) %>
-                </ul>
-            </div>
-        </div>
-    </div>
-</div>
-<%- include('../layouts/footer') %>
+
+    <%- include('../layouts/footer') %>F

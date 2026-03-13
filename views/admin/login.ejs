@@ -1,35 +1,180 @@
 <%- include('../layouts/header') %>
-<div class="row justify-content-center mt-5">
-    <div class="col-md-4">
-        <div class="card rounded-0 border-dark border-2" style="box-shadow: 8px 8px 0px #212529;">
-            <div class="card-header bg-dark text-white rounded-0 py-3 text-center border-bottom border-secondary border-3">
-                <h4 class="mb-0 fw-bold text-uppercase">Admin Console</h4>
-                <span class="badge bg-danger rounded-0 mt-1">RESTRICTED AREA</span>
-            </div>
-            <div class="card-body p-4 bg-light">
-                <% if(error) { %> 
-                    <div class="alert alert-danger rounded-0 border-danger fw-bold"><%= error %></div> 
-                <% } %>
-                
-                <form action="/auth/login/admin" method="POST">
-                    <div class="mb-3">
-                        <label class="fw-bold small text-uppercase text-muted">Username</label>
-                        <input type="text" name="username" class="form-control rounded-0 border-dark bg-white" required>
+
+    <style>
+        /* Admin-specific theme overrides blending with the global dark theme */
+        :root {
+            --shadow-text: #f8fafc;
+            /* Brighter white */
+            --shadow-muted: #cbd5e1;
+            /* Lighter gray for readability */
+            --shadow-card: #111827;
+        }
+
+        .admin-wrapper {
+            min-height: 80vh;
+            display: flex;
+            align-items: center;
+        }
+
+        .admin-card {
+            background-color: var(--shadow-card);
+            border-radius: 1rem;
+            /* Subtle red border to indicate a secure/restricted zone */
+            border: 1px solid rgba(239, 68, 68, 0.2) !important;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5) !important;
+        }
+
+        .admin-card:hover {
+            transform: translateY(-3px);
+            /* Red glowing shadow on hover */
+            box-shadow: 0 15px 35px rgba(239, 68, 68, 0.15) !important;
+        }
+
+        /* Distinctive dark-red gradient for the Admin Header */
+        .admin-header-bg {
+            background: linear-gradient(135deg, #7f1d1d, #dc2626);
+        }
+
+        /* Customizing Admin Inputs - FIXED FOR VISIBILITY */
+        .form-control,
+        .input-group-text {
+            background-color: rgba(0, 0, 0, 0.4) !important;
+            border: 1px solid rgba(255, 255, 255, 0.15) !important;
+            color: #ffffff !important;
+            /* Force text to be pure white */
+        }
+
+        /* Red focus state for admin inputs */
+        .form-control:focus {
+            background-color: rgba(0, 0, 0, 0.6) !important;
+            box-shadow: 0 0 0 0.25rem rgba(220, 38, 38, 0.25) !important;
+            border-color: #dc2626 !important;
+            color: #ffffff !important;
+        }
+
+        /* Fixed Placeholder Visibility */
+        .form-control::placeholder {
+            color: rgba(255, 255, 255, 0.6) !important;
+            opacity: 1;
+        }
+
+        .input-group-text i {
+            color: var(--shadow-muted) !important;
+        }
+
+        .input-group:focus-within .input-group-text i {
+            color: #dc2626 !important;
+            transition: color 0.3s ease;
+        }
+
+        /* Admin Buttons */
+        .btn-admin {
+            background-color: #dc2626;
+            border-color: #dc2626;
+            color: white;
+        }
+
+        .btn-admin:hover,
+        .btn-admin:focus {
+            background-color: #b91c1c;
+            border-color: #b91c1c;
+            color: white;
+        }
+
+        /* Glowing restricted badge */
+        .badge-restricted {
+            background-color: rgba(0, 0, 0, 0.4) !important;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            letter-spacing: 2px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5) inset;
+        }
+
+        /* Divider and Link */
+        hr.custom-divider {
+            border-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .return-link {
+            color: var(--shadow-muted);
+            transition: color 0.3s ease;
+        }
+
+        .return-link:hover {
+            color: #ffffff;
+        }
+
+        /* Force muted text (like labels) to be readable */
+        .text-muted {
+            color: var(--shadow-muted) !important;
+        }
+    </style>
+
+    <div class="container admin-wrapper my-5">
+        <div class="row justify-content-center w-100">
+            <div class="col-12 col-sm-10 col-md-8 col-lg-5 col-xl-4">
+                <div class="card admin-card border-0 overflow-hidden">
+
+                    <div class="card-header admin-header-bg text-white border-0 py-4 text-center">
+                        <i class="fa-solid fa-server fa-3x mb-3"></i>
+                        <h3 class="mb-1 fw-bold text-uppercase" style="letter-spacing: 1px;">Admin Console</h3>
                     </div>
-                    
-                    <div class="mb-4">
-                        <label class="fw-bold small text-uppercase text-muted">System Password</label>
-                        <input type="password" name="password" class="form-control rounded-0 border-dark bg-white" required>
+
+                    <div class="card-body p-4 p-md-5">
+
+                        <% if(error) { %>
+                            <div class="alert alert-danger d-flex align-items-center rounded-3 fw-bold shadow-sm border-0 bg-dark text-danger"
+                                role="alert">
+                                <i class="fa-solid fa-shield-xmark me-2 fs-5"></i>
+                                <div>
+                                    <%= error %>
+                                </div>
+                            </div>
+                            <% } %>
+
+                                <form action="/auth/login/admin" method="POST">
+
+                                    <div class="mb-4">
+                                        <label class="fw-bold small text-uppercase text-muted mb-2">System
+                                            Username</label>
+                                        <div class="input-group input-group-lg shadow-sm">
+                                            <span class="input-group-text border-end-0"><i
+                                                    class="fa-solid fa-user-shield"></i></span>
+                                            <input type="text" name="username" class="form-control border-start-0 ps-0"
+                                                placeholder="admin_root" required>
+                                        </div>
+                                    </div>
+
+                                    <div class="mb-5">
+                                        <label class="fw-bold small text-uppercase text-muted mb-2">Security Key</label>
+                                        <div class="input-group input-group-lg shadow-sm">
+                                            <span class="input-group-text border-end-0"><i
+                                                    class="fa-solid fa-key"></i></span>
+                                            <input type="password" name="password"
+                                                class="form-control border-start-0 ps-0" placeholder="••••••••••••"
+                                                required>
+                                        </div>
+                                    </div>
+
+                                    <button type="submit"
+                                        class="btn btn-admin btn-lg rounded-3 w-100 fw-bold shadow-sm d-flex justify-content-center align-items-center gap-2">
+                                        <i class="fa-solid fa-unlock-keyhole"></i>
+                                        <span>UNLOCK SYSTEM</span>
+                                    </button>
+                                </form>
+
+                                <hr class="my-4 custom-divider">
+
+                                <div class="text-center">
+                                    <a href="/auth/login/student"
+                                        class="return-link small text-decoration-none fw-bold">
+                                        &larr; Return to Student Portal
+                                    </a>
+                                </div>
                     </div>
-                    
-                    <button type="submit" class="btn btn-dark rounded-0 w-100 fw-bold fs-5">UNLOCK SYSTEM</button>
-                </form>
-                
-                <div class="mt-4 text-center pt-3 border-top border-secondary">
-                    <a href="/auth/login/student" class="text-dark small text-decoration-none fw-bold">&larr; Return to Student Portal</a>
                 </div>
             </div>
         </div>
     </div>
-</div>
-<%- include('../layouts/footer') %>
+
+    <%- include('../layouts/footer') %>

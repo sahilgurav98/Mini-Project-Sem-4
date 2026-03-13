@@ -5,14 +5,14 @@ import { activeModel } from '../ml/modelStore.js'; // <-- Import the RAM store
 export const getDashboard = async (req, res) => {
     const products = await Product.find({});
     const orders = await Order.find({}).sort({ orderTime: -1 });
-    
-    // Check if the model exists in RAM right now
-    const isModelTrained = activeModel !== null; 
 
-    res.render('admin/dashboard', { 
-        products, 
-        orders, 
-        prediction: null, 
+    // Check if the model exists in RAM right now
+    const isModelTrained = activeModel !== null;
+
+    res.render('admin/dashboard', {
+        products,
+        orders,
+        prediction: null,
         error: null,
         isModelTrained // <-- Pass it to the EJS file
     });

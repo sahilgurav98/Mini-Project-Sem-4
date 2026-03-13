@@ -1,62 +1,227 @@
 <%- include('../layouts/header') %>
-<div class="row justify-content-center mt-4 mb-5">
-    <div class="col-md-6">
-        <div class="card rounded-0 shadow-sm border-dark border-2">
-            <div class="card-header bg-dark text-white rounded-0 py-3">
-                <h4 class="mb-0"><span class="text-primary">///</span> NEW STUDENT REGISTRATION</h4>
-            </div>
-            <div class="card-body p-4">
-                <% if(error) { %> 
-                    <div class="alert alert-danger rounded-0 border-dark fw-bold"><%= error %></div> 
-                <% } %>
-                
-                <form action="/auth/signup/student" method="POST">
-                    <div class="mb-3">
-                        <label class="fw-bold small text-uppercase">Full Name</label>
-                        <input type="text" name="name" class="form-control rounded-0 border-dark" placeholder="John Doe" required>
-                    </div>
-                    
-                    <div class="mb-3">
-                        <label class="fw-bold small text-uppercase">Email Address</label>
-                        <input type="email" name="email" class="form-control rounded-0 border-dark" placeholder="student@college.edu" required>
+
+    <style>
+        /* Using the same dark theme palette from the login page */
+        :root {
+            --shadow-accent: #7c3aed;
+            /* Electric Purple */
+            --shadow-accent-hover: #6d28d9;
+            --shadow-bg: #0b0f19;
+            /* Very dark blue/black */
+            --shadow-card: #111827;
+            /* Dark gray */
+            --shadow-text: #f3f4f6;
+            --shadow-muted: #9ca3af;
+        }
+
+        body {
+            background-color: var(--shadow-bg);
+            color: var(--shadow-text);
+        }
+
+        .signup-wrapper {
+            min-height: 80vh;
+            display: flex;
+            align-items: center;
+            padding: 2rem 0;
+            /* Extra padding for taller form */
+        }
+
+        .student-card {
+            background-color: var(--shadow-card);
+            border-radius: 1rem;
+            border: 1px solid rgba(255, 255, 255, 0.05) !important;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5) !important;
+        }
+
+        .student-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 35px rgba(124, 58, 237, 0.15) !important;
+        }
+
+        .custom-header-bg {
+            background: linear-gradient(135deg, #4c1d95, #7c3aed);
+        }
+
+        .btn-primary {
+            background-color: var(--shadow-accent);
+            border-color: var(--shadow-accent);
+            color: white;
+        }
+
+        .btn-primary:hover,
+        .btn-primary:focus {
+            background-color: var(--shadow-accent-hover);
+            border-color: var(--shadow-accent-hover);
+        }
+
+        .form-control,
+        .form-select,
+        .input-group-text {
+            background-color: rgba(255, 255, 255, 0.03);
+            border-color: rgba(255, 255, 255, 0.1);
+            color: var(--shadow-text);
+        }
+
+        .form-control:focus,
+        .form-select:focus {
+            background-color: rgba(255, 255, 255, 0.05);
+            box-shadow: 0 0 0 0.25rem rgba(124, 58, 237, 0.25);
+            border-color: var(--shadow-accent);
+            color: white;
+        }
+
+        .form-control::placeholder {
+            color: rgba(156, 163, 175, 0.5);
+        }
+
+        /* Fix for native select dropdown options in dark mode */
+        .form-select option {
+            background-color: var(--shadow-card);
+            color: var(--shadow-text);
+        }
+
+        .input-group-text i {
+            color: var(--shadow-muted);
+        }
+
+        .input-group:focus-within .input-group-text i {
+            color: var(--shadow-accent) !important;
+            transition: color 0.3s ease;
+        }
+
+        .text-muted {
+            color: var(--shadow-muted) !important;
+        }
+
+        /* Custom border color for dark mode dividers */
+        .custom-divider {
+            border-color: rgba(255, 255, 255, 0.1) !important;
+        }
+
+        /* Link hover states */
+        .hover-accent {
+            color: var(--shadow-accent) !important;
+            transition: color 0.3s ease;
+        }
+
+        .hover-accent:hover {
+            color: var(--shadow-accent-hover) !important;
+        }
+    </style>
+
+    <div class="container signup-wrapper">
+        <div class="row justify-content-center w-100">
+            <div class="col-12 col-sm-11 col-md-9 col-lg-7 col-xl-6">
+                <div class="card student-card border-0 overflow-hidden">
+
+                    <div class="card-header custom-header-bg text-white border-0 py-4 text-center">
+                        <i class="fa-solid fa-user-plus fa-3x mb-3"></i>
+                        <h3 class="mb-0 fw-bold">NEW STUDENT REGISTRATION</h3>
+                        <small class="text-white-50 text-uppercase" style="letter-spacing: 1px;">Join the portal</small>
                     </div>
 
-                    <div class="row g-3 mb-3">
-                        <div class="col-md-6">
-                            <label class="fw-bold small text-uppercase">Registration Number</label>
-                            <input type="text" name="regNo" class="form-control rounded-0 border-dark" placeholder="e.g. 2023CS01" required>
-                        </div>
-                        <div class="col-md-6">
-                            <label class="fw-bold small text-uppercase">Year</label>
-                            <select name="year" class="form-select rounded-0 border-dark" required>
-                                <option value="" disabled selected>Select Year...</option>
-                                <option value="1st Year">1st Year</option>
-                                <option value="2nd Year">2nd Year</option>
-                                <option value="3rd Year">3rd Year</option>
-                                <option value="4th Year">4th Year</option>
-                            </select>
-                        </div>
-                    </div>
+                    <div class="card-body p-4 p-md-5">
 
-                    <div class="mb-3">
-                        <label class="fw-bold small text-uppercase">Branch</label>
-                        <input type="text" name="branch" class="form-control rounded-0 border-dark" placeholder="e.g. CSE, IT, MECH" required>
-                    </div>
+                        <% if(error) { %>
+                            <div class="alert alert-danger d-flex align-items-center rounded-3 fw-bold shadow-sm border-0"
+                                role="alert">
+                                <i class="fa-solid fa-circle-exclamation me-2 fs-5"></i>
+                                <div>
+                                    <%= error %>
+                                </div>
+                            </div>
+                            <% } %>
 
-                    <div class="mb-4">
-                        <label class="fw-bold small text-uppercase">Create Password</label>
-                        <input type="password" name="password" class="form-control rounded-0 border-dark" required>
-                    </div>
+                                <form action="/auth/signup/student" method="POST">
 
-                    <button type="submit" class="btn btn-dark rounded-0 w-100 fw-bold fs-5 py-2">REGISTER ACCOUNT</button>
-                </form>
-                
-                <div class="mt-4 text-center border-top border-dark pt-3">
-                    <span class="text-muted">Already have an account?</span> 
-                    <a href="/auth/login/student" class="text-dark fw-bold text-decoration-none">Login here</a>
+                                    <div class="mb-4">
+                                        <label class="fw-bold small text-uppercase text-muted mb-2">Full Name</label>
+                                        <div class="input-group input-group-lg shadow-sm">
+                                            <span class="input-group-text border-end-0"><i
+                                                    class="fa-solid fa-user"></i></span>
+                                            <input type="text" name="name" class="form-control border-start-0 ps-0"
+                                                placeholder="e.g. rahul sharma" required>
+                                        </div>
+                                    </div>
+
+                                    <div class="mb-4">
+                                        <label class="fw-bold small text-uppercase text-muted mb-2">Email
+                                            Address</label>
+                                        <div class="input-group input-group-lg shadow-sm">
+                                            <span class="input-group-text border-end-0"><i
+                                                    class="fa-solid fa-envelope"></i></span>
+                                            <input type="email" name="email" class="form-control border-start-0 ps-0"
+                                                placeholder="student@mu.ac.in" required>
+                                        </div>
+                                    </div>
+
+                                    <div class="row g-3 mb-4">
+                                        <div class="col-md-6">
+                                            <label class="fw-bold small text-uppercase text-muted mb-2">Registration
+                                                Number</label>
+                                            <div class="input-group input-group-lg shadow-sm">
+                                                <span class="input-group-text border-end-0"><i
+                                                        class="fa-solid fa-id-card"></i></span>
+                                                <input type="text" name="regNo" class="form-control border-start-0 ps-0"
+                                                    placeholder="e.g. 2024CS01" required>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="fw-bold small text-uppercase text-muted mb-2">Year</label>
+                                            <div class="input-group input-group-lg shadow-sm">
+                                                <span class="input-group-text border-end-0"><i
+                                                        class="fa-solid fa-graduation-cap"></i></span>
+                                                <select name="year" class="form-select border-start-0 ps-0" required>
+                                                    <option value="" disabled selected>Select Year...</option>
+                                                    <option value="1st Year">1st Year</option>
+                                                    <option value="2nd Year">2nd Year</option>
+                                                    <option value="3rd Year">3rd Year</option>
+                                                    <option value="4th Year">4th Year</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="mb-4">
+                                        <label class="fw-bold small text-uppercase text-muted mb-2">Branch</label>
+                                        <div class="input-group input-group-lg shadow-sm">
+                                            <span class="input-group-text border-end-0"><i
+                                                    class="fa-solid fa-laptop-code"></i></span>
+                                            <input type="text" name="branch" class="form-control border-start-0 ps-0"
+                                                placeholder="e.g. Computer Science" required>
+                                        </div>
+                                    </div>
+
+                                    <div class="mb-5">
+                                        <label class="fw-bold small text-uppercase text-muted mb-2">Create
+                                            Password</label>
+                                        <div class="input-group input-group-lg shadow-sm">
+                                            <span class="input-group-text border-end-0"><i
+                                                    class="fa-solid fa-lock"></i></span>
+                                            <input type="password" name="password"
+                                                class="form-control border-start-0 ps-0" placeholder="••••••••"
+                                                required>
+                                        </div>
+                                    </div>
+
+                                    <button type="submit"
+                                        class="btn btn-primary btn-lg rounded-3 w-100 fw-bold shadow-sm d-flex justify-content-center align-items-center gap-2">
+                                        <i class="fa-solid fa-user-check"></i>
+                                        <span>REGISTER ACCOUNT</span>
+                                    </button>
+                                </form>
+
+                                <div class="mt-4 text-center border-top custom-divider pt-4">
+                                    <span class="text-muted">Already have an account?</span>
+                                    <a href="/auth/login/student"
+                                        class="hover-accent fw-bold text-decoration-none ms-1">Login here</a>
+                                </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
-<%- include('../layouts/footer') %>
+
+    <%- include('../layouts/footer') %>

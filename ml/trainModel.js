@@ -12,7 +12,7 @@ export const trainFNN = async (filePath) => {
     // --- NEW: Dynamically discover all unique items in the Excel file ---
     const uniqueItemsSet = new Set();
     data.forEach(row => uniqueItemsSet.add(row.Item));
-    const dynamicItemsList = Array.from(uniqueItemsSet); 
+    const dynamicItemsList = Array.from(uniqueItemsSet);
     // Example result: ['Vadapav', 'Rice', 'Pizza', 'Pasta', ...]
 
     const inputs = [];
@@ -25,25 +25,25 @@ export const trainFNN = async (filePath) => {
         outputs.push(row.Demand);
     });
 
-    const inputShapeSize = inputs[0].length; 
+    const inputShapeSize = inputs[0].length;
 
     const xs = tf.tensor2d(inputs);
     const ys = tf.tensor2d(outputs, [outputs.length, 1]);
 
     const model = tf.sequential();
     model.add(tf.layers.dense({ units: 32, activation: 'relu', inputShape: [inputShapeSize] }));
-    model.add(tf.layers.dropout({ rate: 0.2 })); 
+    model.add(tf.layers.dropout({ rate: 0.2 }));
     model.add(tf.layers.dense({ units: 16, activation: 'relu' }));
     model.add(tf.layers.dense({ units: 1 }));
 
     model.compile({ optimizer: tf.train.adam(0.01), loss: 'meanSquaredError', metrics: ['mae'] });
 
     await model.fit(xs, ys, { epochs: 100, shuffle: true, validationSplit: 0.1 });
-    
+
     // Save BOTH the model and the dynamically discovered item list to RAM!
     setModel(model, dynamicItemsList);
 
     xs.dispose();
     ys.dispose();
-    fs.unlinkSync(filePath); 
+    fs.unlinkSync(filePath);
 };

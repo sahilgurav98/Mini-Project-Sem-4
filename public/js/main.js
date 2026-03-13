@@ -14,7 +14,7 @@ function calcTotal() {
 async function submitOrder() {
     const cartItems = [];
     const rows = document.querySelectorAll('#menu-items tr');
-    
+
     rows.forEach(row => {
         const qty = parseInt(row.querySelector('.item-qty').value) || 0;
         if (qty > 0) {
@@ -27,7 +27,7 @@ async function submitOrder() {
     });
 
     if (cartItems.length === 0) return alert("Select at least one item!");
-    
+
     const totalAmount = parseFloat(document.getElementById('grandTotal').innerText);
 
     try {
@@ -37,9 +37,9 @@ async function submitOrder() {
             body: JSON.stringify({ cartItems, totalAmount })
         });
         const data = await res.json();
-        
+
         const msgDiv = document.getElementById('order-msg');
-        if(data.success) {
+        if (data.success) {
             msgDiv.innerHTML = `<div class="alert alert-success rounded-0 border-dark">${data.message}</div>`;
             setTimeout(() => location.reload(), 1500); // Reload to show updated history
         } else {

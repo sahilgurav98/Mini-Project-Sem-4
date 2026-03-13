@@ -7,6 +7,8 @@ import {
     studentLogin,
     adminLogin,
     sendOtp,
+    sendForgotPasswordOtp, 
+    resetPassword,
     logout
 } from '../controllers/authController.js';
 
@@ -46,5 +48,13 @@ router.post('/send-otp', sendOtp);
 
 // Destroys the session and redirects to the student login page
 router.get('/logout', logout);
+
+router.get('/forgot-password', (req, res) => {
+    res.render('student/forgot-password', { error: null });
+});
+
+// 3. Add the POST routes (put this near your other POST routes)
+router.post('/send-reset-otp', sendForgotPasswordOtp);
+router.post('/reset-password', resetPassword);
 
 export default router;

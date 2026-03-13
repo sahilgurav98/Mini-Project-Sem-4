@@ -1,11 +1,23 @@
-// Ensure user is logged in as a student
 export const isStudent = (req, res, next) => {
-    if (req.session.role === 'student') return next();
-    res.redirect('/auth/login/student');
+    // 1. Force the browser to NEVER cache this protected page
+    res.set('Cache-Control', 'no-cache, private, no-store, must-revalidate, max-stale=0, post-check=0, pre-check=0');
+    
+    // 2. Standard auth check
+    if (req.session && req.session.user && req.session.user.role === 'student') {
+        next();
+    } else {
+        res.redirect('/auth/login/student');
+    }
 };
 
-// Ensure user is logged in as an admin
 export const isAdmin = (req, res, next) => {
-    if (req.session.role === 'admin') return next();
-    res.redirect('/auth/login/admin');
+    // 1. Force the browser to NEVER cache this protected page
+    res.set('Cache-Control', 'no-cache, private, no-store, must-revalidate, max-stale=0, post-check=0, pre-check=0');
+    
+    // 2. Standard auth check
+    if (req.session && req.session.user && req.session.user.role === 'admin') {
+        next();
+    } else {
+        res.redirect('/auth/login/admin');
+    }
 };

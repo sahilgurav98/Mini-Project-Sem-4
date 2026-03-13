@@ -4,6 +4,7 @@ import dotenv from 'dotenv';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import connectDB from './config/db.js';
+import MongoStore from 'connect-mongo';
 
 // Route Imports
 import authRoutes from './routes/authRoutes.js';
@@ -32,7 +33,16 @@ app.use(session({
     secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
-    cookie: { secure: false } // Set to true if using HTTPS
+    // Store sessions in MongoDB instead of RAM
+    store: MongoStore.create({
+        mongoUrl: process.env.MONGODB_URI,
+        collectionName: 'sessions' // This will create a new collection in your DB
+    }),
+    cookie: {
+        secure: false, // Set to true ONLY if you have HTTPS/SSL enabled
+        httpOnly: true,
+        maxAge: 1000 * 60 * 60 * 24 * 30 // 30 Days in milliseconds
+    }
 }));
 
 // View Engine setup

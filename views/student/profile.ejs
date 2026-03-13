@@ -1,0 +1,69 @@
+<%- include('../layouts/header') %>
+<style>
+    :root { --shadow-accent: #7c3aed; --shadow-bg: #0b0f19; --shadow-card: #111827; --shadow-text: #f3f4f6; --shadow-muted: #9ca3af; }
+    body { background-color: var(--shadow-bg); color: var(--shadow-text); }
+    .form-control, .form-select { background-color: rgba(255, 255, 255, 0.03); border-color: rgba(255, 255, 255, 0.1); color: white; }
+    .form-control:focus, .form-select:focus { background-color: rgba(255, 255, 255, 0.05); border-color: var(--shadow-accent); color: white; }
+    .form-control[readonly] { background-color: rgba(0,0,0,0.5); color: #6c757d; }
+</style>
+
+<div class="container my-5">
+    <div class="d-flex align-items-center mb-4 pb-3 border-bottom" style="border-color: rgba(255,255,255,0.1) !important;">
+        <a href="/student/dashboard" class="btn btn-outline-light btn-sm me-3 rounded-pill px-3"><i class="fa-solid fa-arrow-left"></i> Back</a>
+        <h2 class="mb-0 fw-bold text-white"><i class="fa-solid fa-user-pen me-2" style="color: var(--shadow-accent);"></i> Profile Settings</h2>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card shadow-lg border-0 p-4 p-md-5" style="background-color: var(--shadow-card); border-radius: 1rem;">
+                
+                <% if(message) { %>
+                    <div class="alert alert-success fw-bold"><i class="fa-solid fa-circle-check me-2"></i><%= message %></div>
+                <% } %>
+
+                <form action="/student/profile/update" method="POST">
+                    
+                    <div class="row mb-4 g-3">
+                        <div class="col-md-6">
+                            <label class="small fw-bold text-muted text-uppercase mb-1">Email (Locked)</label>
+                            <input type="text" class="form-control" value="<%= user.email %>" readonly>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="small fw-bold text-muted text-uppercase mb-1">Reg No. (Locked)</label>
+                            <input type="text" class="form-control" value="<%= user.regNo %>" readonly>
+                        </div>
+                    </div>
+
+                    <hr style="border-color: rgba(255,255,255,0.1);" class="mb-4">
+
+                    <div class="mb-3">
+                        <label class="small fw-bold text-muted text-uppercase mb-1">Full Name</label>
+                        <input type="text" name="name" class="form-control form-control-lg" value="<%= user.name %>" required>
+                    </div>
+
+                    <div class="row mb-4 g-3">
+                        <div class="col-md-6">
+                            <label class="small fw-bold text-muted text-uppercase mb-1">Current Year</label>
+                            <select name="year" class="form-select form-select-lg" required>
+                                <option value="1st Year" <%= user.year === '1st Year' ? 'selected' : '' %>>1st Year</option>
+                                <option value="2nd Year" <%= user.year === '2nd Year' ? 'selected' : '' %>>2nd Year</option>
+                                <option value="3rd Year" <%= user.year === '3rd Year' ? 'selected' : '' %>>3rd Year</option>
+                                <option value="4th Year" <%= user.year === '4th Year' ? 'selected' : '' %>>4th Year</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="small fw-bold text-muted text-uppercase mb-1">Branch</label>
+                            <input type="text" name="branch" class="form-control form-control-lg" value="<%= user.branch %>" required>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-lg w-100 fw-bold" style="background-color: var(--shadow-accent); color: white;">
+                        <i class="fa-solid fa-floppy-disk me-2"></i> SAVE CHANGES
+                    </button>
+                </form>
+
+            </div>
+        </div>
+    </div>
+</div>
+<%- include('../layouts/footer') %>

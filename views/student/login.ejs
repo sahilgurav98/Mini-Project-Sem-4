@@ -141,12 +141,20 @@
                                                 placeholder="student@example.com" required>
                                         </div>
                                     </div>
-
                                     <div class="mb-5">
-                                        <label class="fw-bold small text-uppercase text-muted mb-2">Password</label>
+                                        <div class="d-flex justify-content-between align-items-center mb-2">
+                                            <label class="fw-bold small text-uppercase text-muted mb-0">Password</label>
+                                            <a href="/auth/forgot-password"
+                                                class="small fw-bold text-decoration-none hover-accent"
+                                                style="color: var(--shadow-accent);">
+                                                Forgot Password?
+                                            </a>
+                                        </div>
+
                                         <div class="input-group input-group-lg shadow-sm">
-                                            <span class="input-group-text border-end-0"><i
-                                                    class="fa-solid fa-lock"></i></span>
+                                            <span class="input-group-text border-end-0">
+                                                <i class="fa-solid fa-lock"></i>
+                                            </span>
                                             <input type="password" name="password"
                                                 class="form-control border-start-0 ps-0" placeholder="••••••••"
                                                 required>

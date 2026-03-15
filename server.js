@@ -61,9 +61,19 @@ app.use('/auth', authRoutes);
 app.use('/student', studentRoutes);
 app.use('/admin', adminRoutes);
 
-// Home Redirect
+
 app.get('/', (req, res) => {
-    res.redirect('/auth/login/student');
+    // If they are already logged in, skip the landing page and take them to their dashboard
+    if (req.session && req.session.user) {
+        if (req.session.user.role === "student") {
+            return res.redirect('/student/dashboard');
+        } else if (req.session.user.role === "admin") {
+            return res.redirect('/admin/dashboard');
+        }
+    }
+    
+    // If not logged in, show the beautiful new landing page
+    res.render('home'); 
 });
 
 // Start Server

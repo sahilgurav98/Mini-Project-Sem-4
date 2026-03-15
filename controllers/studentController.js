@@ -83,3 +83,20 @@ export const updateProfile = async (req, res) => {
         res.render('student/profile', { user: req.session.user, message: "Error updating profile." });
     }
 };
+
+// API to fetch active coupons for the logged-in student
+export const getActiveCoupons = async (req, res) => {
+    try {
+        const userId = req.session.user._id;
+        // Find orders that are Paid but NOT yet Fulfilled
+        const activeCoupons = await Order.find({
+            studentId: userId, // or whatever your user reference field is called
+            paymentStatus: 'Paid',
+            status: { $ne: 'Fulfilled' }
+        });
+        
+        res.json(activeCoupons);
+    } catch (error) {
+        res.status(500).json({ error: "Server error" });
+    }
+};

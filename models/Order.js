@@ -14,7 +14,9 @@ const orderSchema = new mongoose.Schema({
     }],
     totalAmount: Number,
     status: { type: String, enum: ['Pending', 'Fulfilled'], default: 'Pending' },
-    orderTime: { type: Date, default: Date.now }
+    orderTime: { type: Date, default: Date.now },
+    paymentStatus: { type: String, enum: ['Unpaid', 'Paid'], default: 'Unpaid' },
+    couponCode: { type: String, default: null }
 });
 
 export default mongoose.model('Order', orderSchema);

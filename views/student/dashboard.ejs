@@ -164,7 +164,7 @@
             <i class="fa-solid fa-house-user fa-2x me-3" style="color: var(--shadow-accent);"></i>
             <h2 class="mb-0 fw-bold text-white">Student Dashboard</h2>
         </div>
-
+        <div id="live-coupon-container" class="mb-4"></div>
         <div class="row g-4">
             <div class="col-lg-8">
                 <div class="card dashboard-card h-100">
@@ -343,5 +343,46 @@
                 console.error("Error fetching student orders:", error);
             }
         }
+        // Poll for active coupons every 3 seconds
+        setInterval(fetchActiveCoupons, 3000);
+        fetchActiveCoupons(); // Run immediately on load
+
+        async function fetchActiveCoupons() {
+            try {
+                const response = await fetch('/student/api/coupons');
+                const coupons = await response.json();
+                const container = document.getElementById('live-coupon-container');
+
+                if (coupons.length === 0) {
+                    container.innerHTML = ''; // Clear coupons if order is fulfilled!
+                    return;
+                }
+
+                let html = '';
+                coupons.forEach(coupon => {
+                    html += `
+            <div class="card bg-dark border-info shadow-lg mb-3" style="border-width: 2px; border-style: dashed;">
+                <div class="card-body d-flex justify-content-between align-items-center p-4">
+                    <div>
+                        <h6 class="text-uppercase text-info fw-bold mb-1">
+                            <i class="fa-solid fa-check-circle me-1"></i> Payment Verified
+                        </h6>
+                        <h2 class="text-white fw-bold mb-0 tracking-wider">
+                            ${coupon.couponCode}
+                        </h2>
+                        <small class="text-muted">Show this code at the counter to collect your food.</small>
+                    </div>
+                    <div class="text-end">
+                        <i class="fa-solid fa-qrcode fa-3x text-info opacity-50"></i>
+                    </div>
+                </div>
+            </div>`;
+                });
+
+                container.innerHTML = html;
+            } catch (error) {
+                console.error("Error fetching coupons:", error);
+            }
+        }
     </script>
-    <%- include('../layouts/footer') %>F
+    <%- include('../layouts/footer') %>

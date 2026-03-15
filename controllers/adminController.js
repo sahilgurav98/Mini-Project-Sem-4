@@ -143,3 +143,22 @@ export const downloadTrainingData = async (req, res) => {
     res.redirect("/admin/dashboard?error=Failed to generate CSV data");
   }
 };
+
+// Issue a Digital Coupon upon Payment
+export const issueCoupon = async (req, res) => {
+    try {
+        // Generate a random 4-digit hex code like "A8F2"
+        const randomCode = Math.floor(Math.random() * 65536).toString(16).toUpperCase().padStart(4, '0');
+        const couponString = `CDMS-${randomCode}`;
+
+        await Order.findByIdAndUpdate(req.params.id, {
+            paymentStatus: 'Paid',
+            couponCode: couponString
+        });
+
+        res.redirect('/admin/dashboard');
+    } catch (error) {
+        console.error("Error issuing coupon:", error);
+        res.redirect('/admin/dashboard?error=Failed to issue coupon');
+    }
+};

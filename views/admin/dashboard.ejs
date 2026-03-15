@@ -121,7 +121,7 @@
             border: 1px solid rgba(56, 189, 248, 0.3);
             transition: all 0.3s ease;
         }
-        
+
         .btn-ai-download:hover {
             background-color: rgba(56, 189, 248, 0.2);
             color: #fff;
@@ -181,14 +181,16 @@
 
             <div class="card-body p-4">
                 <% if(error) { %>
-                    <div class="alert alert-danger d-flex align-items-center rounded-3 shadow-sm border-0 bg-dark text-danger">
+                    <div
+                        class="alert alert-danger d-flex align-items-center rounded-3 shadow-sm border-0 bg-dark text-danger">
                         <i class="fa-solid fa-triangle-exclamation me-2"></i>
                         <%= error %>
                     </div>
                     <% } %>
 
                         <% if(isModelTrained && !prediction) { %>
-                            <div class="alert alert-success d-flex align-items-center rounded-3 shadow-sm border-0 bg-dark text-success-custom mb-4">
+                            <div
+                                class="alert alert-success d-flex align-items-center rounded-3 shadow-sm border-0 bg-dark text-success-custom mb-4">
                                 <i class="fa-solid fa-microchip me-2"></i> AI Model successfully trained and loaded into
                                 server memory! Ready for predictions.
                             </div>
@@ -197,20 +199,22 @@
                                 <div class="row g-4">
                                     <div class="col-lg-5 border-end border-secondary pe-lg-4 d-flex flex-column justify-content-center"
                                         style="border-color: var(--shadow-border) !important;">
-                                        
+
                                         <div class="d-flex justify-content-between align-items-center mb-3">
                                             <label class="fw-bold text-uppercase text-muted small mb-0">
                                                 <i class="fa-solid fa-database me-1"></i> 1. Training Data
                                             </label>
-                                            
-                                            <a href="/admin/ml/download-data" class="btn btn-sm btn-ai-download shadow-sm fw-bold">
+
+                                            <a href="/admin/ml/download-data"
+                                                class="btn btn-sm btn-ai-download shadow-sm fw-bold">
                                                 <i class="fa-solid fa-cloud-arrow-down me-1"></i> Get Last 30 Days
                                             </a>
                                         </div>
 
                                         <form action="/admin/ml/train" method="POST" enctype="multipart/form-data">
                                             <div class="input-group mb-2 shadow-sm">
-                                                <input type="file" name="dataset" class="form-control ai-input" accept=".csv, .xlsx" required>
+                                                <input type="file" name="dataset" class="form-control ai-input"
+                                                    accept=".csv, .xlsx" required>
                                                 <button class="btn btn-ai fw-bold px-4">
                                                     <i class="fa-solid fa-gears"></i> TRAIN
                                                 </button>
@@ -421,7 +425,8 @@
         </div>
     </div>
 
-    <audio id="notificationSound" src="https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3" preload="auto"></audio>
+    <audio id="notificationSound" src="https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3"
+        preload="auto"></audio>
 
     <script>
         let latestOrderId = null; // Tracks the most recent order
@@ -441,7 +446,7 @@
                 // --- SOUND LOGIC ---
                 if (orders.length > 0) {
                     const currentLatest = orders[0]._id; // The newest order is always at the top
-                    
+
                     // If it's not the first load, and the top order ID is different than before, it's a new order!
                     if (!isFirstLoad && latestOrderId !== currentLatest) {
                         document.getElementById('notificationSound').play().catch(e => console.log("Audio blocked until interaction."));
@@ -471,22 +476,36 @@
                     const statusBadge = `<span class="badge ${badgeClass} rounded-pill px-3 shadow-sm">${o.status}</span>`;
 
                     // 3. Build the action buttons HTML
+                    // 3. Build the action buttons HTML
                     let actionButtons = '<div class="d-flex justify-content-end gap-2">';
+
                     if (o.status !== 'Fulfilled') {
-                        actionButtons += `
-                        <form action="/admin/order/fulfill/${o._id}" method="POST" class="m-0">
-                            <button class="btn btn-sm btn-success shadow-sm rounded-2" title="Mark as Fulfilled">
-                                <i class="fa-solid fa-check"></i>
-                            </button>
-                        </form>`;
+                        if (o.paymentStatus !== 'Paid') {
+                            // Show ISSUE COUPON button if unpaid
+                            actionButtons += `
+        <form action="/admin/order/coupon/${o._id}" method="POST" class="m-0">
+            <button class="btn btn-sm btn-info shadow-sm rounded-2 text-dark fw-bold" title="Payment Received - Issue Coupon">
+                <i class="fa-solid fa-ticket"></i> ISSUE COUPON
+            </button>
+        </form>`;
+                        } else {
+                            // Show FULFILL button only if it IS paid
+                            actionButtons += `
+        <form action="/admin/order/fulfill/${o._id}" method="POST" class="m-0">
+            <button class="btn btn-sm btn-success shadow-sm rounded-2" title="Mark as Fulfilled">
+                <i class="fa-solid fa-check"></i> FULFILL
+            </button>
+        </form>`;
+                        }
                     }
+
                     actionButtons += `
-                    <form action="/admin/order/delete/${o._id}" method="POST" class="m-0">
-                        <button class="btn btn-sm btn-danger shadow-sm rounded-2" title="Delete Order">
-                            <i class="fa-solid fa-trash-can"></i>
-                        </button>
-                    </form>
-                    </div>`;
+<form action="/admin/order/delete/${o._id}" method="POST" class="m-0">
+    <button class="btn btn-sm btn-danger shadow-sm rounded-2" title="Delete Order">
+        <i class="fa-solid fa-trash-can"></i>
+    </button>
+</form>
+</div>`;
 
                     // 4. Put it all together
                     html += `
@@ -510,4 +529,4 @@
         }
     </script>
 
-<%- include('../layouts/footer') %>
+    <%- include('../layouts/footer') %>

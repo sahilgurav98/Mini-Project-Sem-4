@@ -316,7 +316,7 @@
                                 <tr>
                                     <th class="ps-4">Student</th>
                                     <th>Order Details</th>
-                                    <th>Status</th>
+                                    <th class="text-center">Status</th>
                                     <th class="pe-4 text-end">Actions</th>
                                 </tr>
                             </thead>
@@ -348,28 +348,41 @@
                                             <div class="mt-2 fw-bold text-success-custom fs-5">₹<%= o.totalAmount %>
                                             </div>
                                         </td>
-                                        <td>
+                                        <td class="text-center">
                                             <span
-                                                class="badge <%= o.status==='Fulfilled'?'bg-success text-white':'bg-warning text-dark'%> rounded-pill px-3 shadow-sm">
+                                                class="badge w-100 <%= o.status==='Fulfilled'?'bg-success text-white':'bg-warning text-dark'%> rounded-pill px-3 py-2 shadow-sm">
                                                 <%= o.status %>
                                             </span>
+                                            <% if (o.couponCode && o.status !== 'Fulfilled') { %>
+                                                <div class="mt-2 badge border border-info text-info bg-dark w-100 py-2 d-flex align-items-center justify-content-center" style="font-size: 0.85rem; letter-spacing: 1px;">
+                                                    <i class="fa-solid fa-ticket me-2"></i> <%= o.couponCode %>
+                                                </div>
+                                            <% } %>
                                         </td>
                                         <td class="pe-4">
                                             <div class="d-flex justify-content-end gap-2">
                                                 <% if(o.status !=='Fulfilled' ) { %>
-                                                    <form action="/admin/order/fulfill/<%= o._id %>" method="POST"
-                                                        class="m-0">
-                                                        <button class="btn btn-sm btn-success shadow-sm rounded-2"
-                                                            title="Mark as Fulfilled"><i
-                                                                class="fa-solid fa-check"></i></button>
-                                                    </form>
-                                                    <% } %>
-                                                        <form action="/admin/order/delete/<%= o._id %>" method="POST"
-                                                            class="m-0">
-                                                            <button class="btn btn-sm btn-danger shadow-sm rounded-2"
-                                                                title="Delete Order"><i
-                                                                    class="fa-solid fa-trash-can"></i></button>
+                                                    <% if (o.paymentStatus !== 'Paid') { %>
+                                                        <form action="/admin/order/coupon/<%= o._id %>" method="POST" class="m-0">
+                                                            <button class="btn btn-sm btn-info shadow-sm rounded-2 text-dark fw-bold" title="Payment Received - Issue Coupon">
+                                                                <i class="fa-solid fa-ticket"></i> ISSUE COUPON
+                                                            </button>
                                                         </form>
+                                                    <% } else { %>
+                                                        <form action="/admin/order/fulfill/<%= o._id %>" method="POST"
+                                                            class="m-0">
+                                                            <button class="btn btn-sm btn-success shadow-sm rounded-2"
+                                                                title="Mark as Fulfilled"><i
+                                                                    class="fa-solid fa-check"></i> FULFILL</button>
+                                                        </form>
+                                                    <% } %>
+                                                <% } %>
+                                                <form action="/admin/order/delete/<%= o._id %>" method="POST"
+                                                    class="m-0">
+                                                    <button class="btn btn-sm btn-danger shadow-sm rounded-2"
+                                                        title="Delete Order"><i
+                                                            class="fa-solid fa-trash-can"></i></button>
+                                                </form>
                                             </div>
                                         </td>
                                     </tr>
@@ -473,9 +486,16 @@
 
                     // 2. Build the status badge HTML
                     const badgeClass = o.status === 'Fulfilled' ? 'bg-success text-white' : 'bg-warning text-dark';
-                    const statusBadge = `<span class="badge ${badgeClass} rounded-pill px-3 shadow-sm">${o.status}</span>`;
+                    let statusBadge = `<span class="badge ${badgeClass} w-100 rounded-pill px-3 py-2 shadow-sm">${o.status}</span>`;
+                    
+                    // FIXED: ONLY SHOW COUPON CODE IF IT EXISTS AND STATUS IS NOT FULFILLED
+                    if (o.couponCode && o.status !== 'Fulfilled') {
+                        statusBadge += `
+                        <div class="mt-2 badge border border-info text-info bg-dark w-100 py-2 d-flex align-items-center justify-content-center" style="font-size: 0.85rem; letter-spacing: 1px;">
+                            <i class="fa-solid fa-ticket me-2"></i> ${o.couponCode}
+                        </div>`;
+                    }
 
-                    // 3. Build the action buttons HTML
                     // 3. Build the action buttons HTML
                     let actionButtons = '<div class="d-flex justify-content-end gap-2">';
 
@@ -483,29 +503,29 @@
                         if (o.paymentStatus !== 'Paid') {
                             // Show ISSUE COUPON button if unpaid
                             actionButtons += `
-        <form action="/admin/order/coupon/${o._id}" method="POST" class="m-0">
-            <button class="btn btn-sm btn-info shadow-sm rounded-2 text-dark fw-bold" title="Payment Received - Issue Coupon">
-                <i class="fa-solid fa-ticket"></i> ISSUE COUPON
-            </button>
-        </form>`;
+                                <form action="/admin/order/coupon/${o._id}" method="POST" class="m-0">
+                                    <button class="btn btn-sm btn-info shadow-sm rounded-2 text-dark fw-bold" title="Payment Received - Issue Coupon">
+                                        <i class="fa-solid fa-ticket"></i> ISSUE COUPON
+                                    </button>
+                                </form>`;
                         } else {
                             // Show FULFILL button only if it IS paid
                             actionButtons += `
-        <form action="/admin/order/fulfill/${o._id}" method="POST" class="m-0">
-            <button class="btn btn-sm btn-success shadow-sm rounded-2" title="Mark as Fulfilled">
-                <i class="fa-solid fa-check"></i> FULFILL
-            </button>
-        </form>`;
+                                <form action="/admin/order/fulfill/${o._id}" method="POST" class="m-0">
+                                    <button class="btn btn-sm btn-success shadow-sm rounded-2" title="Mark as Fulfilled">
+                                        <i class="fa-solid fa-check"></i> FULFILL
+                                    </button>
+                                </form>`;
                         }
                     }
 
                     actionButtons += `
-<form action="/admin/order/delete/${o._id}" method="POST" class="m-0">
-    <button class="btn btn-sm btn-danger shadow-sm rounded-2" title="Delete Order">
-        <i class="fa-solid fa-trash-can"></i>
-    </button>
-</form>
-</div>`;
+                        <form action="/admin/order/delete/${o._id}" method="POST" class="m-0">
+                            <button class="btn btn-sm btn-danger shadow-sm rounded-2" title="Delete Order">
+                                <i class="fa-solid fa-trash-can"></i>
+                            </button>
+                        </form>
+                    </div>`;
 
                     // 4. Put it all together
                     html += `
@@ -516,7 +536,7 @@
                             <small class="text-muted">Reg: ${o.regNo}</small>
                         </td>
                         <td>${itemsHtml}</td>
-                        <td>${statusBadge}</td>
+                        <td class="text-center">${statusBadge}</td>
                         <td class="pe-4">${actionButtons}</td>
                     </tr>`;
                 });

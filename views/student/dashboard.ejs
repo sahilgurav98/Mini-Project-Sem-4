@@ -4,18 +4,12 @@
         /* Consistent Dark Theme Palette - BRIGHTENED FOR VISIBILITY */
         :root {
             --shadow-accent: #7c3aed;
-            /* Electric Purple */
             --shadow-accent-hover: #6d28d9;
             --shadow-bg: #0b0f19;
-            /* Very dark blue/black */
             --shadow-card: #111827;
-            /* Dark gray */
             --shadow-text: #f8fafc;
-            /* Made text brighter white */
             --shadow-muted: #cbd5e1;
-            /* Lightened muted text for better contrast */
             --shadow-border: rgba(255, 255, 255, 0.15);
-            /* Slightly more visible borders */
         }
 
         body {
@@ -44,37 +38,73 @@
             border-bottom: 1px solid var(--shadow-border);
         }
 
-        /* Table Styles for Dark Mode - FIXED FOR VISIBILITY */
+        /* Search Bar Styles */
+        .search-container {
+            background-color: rgba(0, 0, 0, 0.2);
+            border-bottom: 1px solid var(--shadow-border);
+        }
+
+        .search-input-group .input-group-text {
+            background-color: rgba(0, 0, 0, 0.4);
+            border: 1px solid var(--shadow-border);
+            border-right: none;
+            color: var(--shadow-muted);
+        }
+
+        .search-input-group .form-control {
+            background-color: rgba(0, 0, 0, 0.4);
+            border: 1px solid var(--shadow-border);
+            border-left: none;
+            color: white;
+        }
+
+        .search-input-group .form-control:focus {
+            box-shadow: none;
+            border-color: var(--shadow-accent);
+        }
+
+        .search-input-group:focus-within .input-group-text,
+        .search-input-group:focus-within .form-control {
+            border-color: var(--shadow-accent);
+            border-top-color: var(--shadow-accent) !important;
+            border-bottom-color: var(--shadow-accent) !important;
+        }
+
+        /* FIXED TABLE STYLES FOR MOBILE RESPONSIVENESS */
         .table-custom {
             color: var(--shadow-text) !important;
             --bs-table-bg: transparent;
             --bs-table-hover-bg: rgba(124, 58, 237, 0.1);
+            margin-bottom: 0;
+            width: 100%;
+            table-layout: fixed; /* THIS IS THE MAGIC FIX FOR MOBILE TABLES */
         }
 
         .table-custom thead th {
             background-color: rgba(0, 0, 0, 0.3);
             color: var(--shadow-muted) !important;
-            /* Forced light gray */
             border-bottom: 1px solid var(--shadow-border);
             font-weight: 600;
             letter-spacing: 0.5px;
+            white-space: nowrap;
         }
 
         .table-custom td {
             vertical-align: middle;
             border-bottom: 1px solid var(--shadow-border);
             color: #ffffff !important;
-            /* Force pure white text */
+            word-wrap: break-word; /* Ensures long text wraps inside the fixed cell */
+            white-space: normal;
         }
 
         /* Quantity Input Styling */
         .qty-input {
-            max-width: 90px;
+            width: 100%;
+            max-width: 80px;
             text-align: center;
             background-color: rgba(0, 0, 0, 0.4) !important;
             border: 1px solid rgba(255, 255, 255, 0.2) !important;
             color: #ffffff !important;
-            /* Forced white text */
         }
 
         .qty-input:focus {
@@ -91,24 +121,15 @@
             background-color: var(--shadow-card);
         }
 
-        .order-history-list::-webkit-scrollbar {
-            width: 8px;
-        }
-
-        .order-history-list::-webkit-scrollbar-track {
-            background: rgba(0, 0, 0, 0.2);
-        }
-
+        .order-history-list::-webkit-scrollbar { width: 6px; }
+        .order-history-list::-webkit-scrollbar-track { background: rgba(0, 0, 0, 0.2); }
         .order-history-list::-webkit-scrollbar-thumb {
             background-color: rgba(255, 255, 255, 0.1);
             border-radius: 10px;
         }
+        .order-history-list::-webkit-scrollbar-thumb:hover { background-color: rgba(124, 58, 237, 0.5); }
 
-        .order-history-list::-webkit-scrollbar-thumb:hover {
-            background-color: rgba(124, 58, 237, 0.5);
-        }
-
-        /* List group updates - FIXED FOR VISIBILITY */
+        /* List group updates */
         .list-group-item {
             background-color: transparent !important;
             color: var(--shadow-text) !important;
@@ -137,62 +158,83 @@
             letter-spacing: 0.5px;
         }
 
-        .text-success {
-            color: #34d399 !important;
-        }
-
-        /* Force muted text to be readable */
-        .text-muted {
-            color: var(--shadow-muted) !important;
-        }
-
+        .text-success { color: #34d399 !important; }
+        .text-muted { color: var(--shadow-muted) !important; }
         .bg-light-dark {
             background-color: rgba(0, 0, 0, 0.4) !important;
             border: 1px solid var(--shadow-border) !important;
         }
+        .history-item-text { color: #e2e8f0 !important; }
 
-        /* Ensure history item text is bright */
-        .history-item-text {
-            color: #e2e8f0 !important;
+        /* --- RESPONSIVE MEDIA QUERIES --- */
+        @media (max-width: 768px) {
+            .dashboard-card { border-radius: 0.75rem; }
+            .qty-input { max-width: 60px; }
+            
+            /* Stack the total and button on mobile */
+            .checkout-footer {
+                flex-direction: column !important;
+                align-items: stretch !important;
+                gap: 1rem !important;
+            }
+            .checkout-total-wrapper {
+                display: flex;
+                justify-content: space-between;
+                width: 100%;
+            }
         }
     </style>
 
-    <div class="container-fluid py-4 mb-5">
+    <div class="container-fluid py-3 py-md-4 mb-5">
 
-        <div class="d-flex align-items-center mb-4 pb-3 border-bottom"
+        <div class="d-flex align-items-center justify-content-center justify-content-md-start mb-4 pb-3 border-bottom"
             style="border-color: var(--shadow-border) !important;">
             <i class="fa-solid fa-house-user fa-2x me-3" style="color: var(--shadow-accent);"></i>
-            <h2 class="mb-0 fw-bold text-white">Student Dashboard</h2>
+            <h2 class="mb-0 fw-bold text-white fs-3 fs-md-2">Student Dashboard</h2>
         </div>
+        
         <div id="live-coupon-container" class="mb-4"></div>
-        <div class="row g-4">
+        
+        <div class="row g-3 g-md-4">
             <div class="col-lg-8">
                 <div class="card dashboard-card h-100">
-                    <div class="card-header custom-header-bg d-flex align-items-center py-3 py-4">
+                    <div class="card-header custom-header-bg d-flex align-items-center p-3 p-md-4">
                         <i class="fa-solid fa-utensils me-3 fs-5"></i>
                         <h5 class="mb-0 fw-bold text-white">Place New Order</h5>
                     </div>
 
                     <div class="card-body p-0 d-flex flex-column">
+
+                        <div class="p-3 search-container">
+                            <div class="input-group search-input-group">
+                                <span class="input-group-text">
+                                    <i class="fa-solid fa-search"></i>
+                                </span>
+                                <input type="text" id="menu-search" class="form-control"
+                                    placeholder="Search for food items..." onkeyup="filterMenu()">
+                            </div>
+                        </div>
+
                         <div class="table-responsive flex-grow-1">
-                            <table class="table table-hover table-custom mb-0">
+                            <table class="table table-hover table-custom">
                                 <thead class="text-uppercase small">
                                     <tr>
-                                        <th class="ps-4 py-3">Item</th>
-                                        <th class="py-3">Price</th>
-                                        <th class="pe-4 py-3 text-end">Quantity</th>
+                                        <th class="ps-3 ps-md-4 py-3" style="width: 50%;">Item</th>
+                                        <th class="py-3 text-start" style="width: 25%;">Price</th>
+                                        <th class="pe-3 pe-md-4 py-3 text-end" style="width: 25%;">Quantity</th>
                                     </tr>
                                 </thead>
                                 <tbody id="menu-items">
-                                    <% products.forEach(p=> { %>
-                                        <tr>
-                                            <td class="item-name fw-bold ps-4">
+                                    <% products.sort((a, b)=>
+                                        a.name.toLowerCase().localeCompare(b.name.toLowerCase())).forEach(p=> { %>
+                                        <tr class="menu-row">
+                                            <td class="item-name fw-bold ps-3 ps-md-4 fs-6 fs-sm-5">
                                                 <%= p.name %>
                                             </td>
-                                            <td class="text-success fw-bold">₹<span class="item-price">
+                                            <td class="text-success fw-bold text-start">₹<span class="item-price">
                                                     <%= p.price %>
                                                 </span></td>
-                                            <td class="pe-4 d-flex justify-content-end">
+                                            <td class="pe-3 pe-md-4 d-flex justify-content-end align-items-center">
                                                 <input type="number"
                                                     class="form-control form-control-sm qty-input rounded-3 shadow-sm item-qty"
                                                     value="0" min="0" onchange="calcTotal()">
@@ -203,15 +245,15 @@
                             </table>
                         </div>
 
-                        <div class="p-4 d-flex flex-column flex-sm-row justify-content-between align-items-center gap-3"
+                        <div class="p-3 p-md-4 d-flex justify-content-between align-items-center checkout-footer"
                             style="background-color: rgba(0,0,0,0.3); border-top: 1px solid var(--shadow-border);">
-                            <div class="d-flex align-items-center">
-                                <h5 class="m-0 text-muted me-2 text-uppercase fw-bold">Total:</h5>
-                                <h3 class="m-0 fw-bold" style="color: var(--shadow-accent);">₹<span
+                            <div class="checkout-total-wrapper align-items-center">
+                                <h5 class="m-0 text-muted me-2 text-uppercase fw-bold fs-6 fs-sm-5">Total:</h5>
+                                <h3 class="m-0 fw-bold fs-4 fs-sm-3" style="color: var(--shadow-accent);">₹<span
                                         id="grandTotal">0</span></h3>
                             </div>
                             <button
-                                class="btn btn-primary btn-lg rounded-3 px-4 fw-bold shadow-lg d-flex justify-content-center align-items-center gap-2 w-sm-100"
+                                class="btn btn-primary btn-lg rounded-3 px-4 fw-bold shadow-lg d-flex justify-content-center align-items-center gap-2 w-100 w-md-auto"
                                 onclick="submitOrder()">
                                 <i class="fa-solid fa-cart-arrow-down"></i>
                                 <span>CONFIRM ORDER</span>
@@ -224,8 +266,8 @@
             </div>
 
             <div class="col-lg-4">
-                <div class="card dashboard-card h-100">
-                    <div class="card-header secondary-header d-flex align-items-center p-3 py-4">
+                <div class="card dashboard-card h-100 mt-3 mt-lg-0">
+                    <div class="card-header secondary-header d-flex align-items-center p-3 p-md-4">
                         <i class="fa-solid fa-clock-rotate-left me-2 text-muted fs-5"></i>
                         <h5 class="mb-0 fw-bold text-white">My Orders</h5>
                     </div>
@@ -233,7 +275,7 @@
                     <div class="card-body p-0 order-history-list">
                         <ul class="list-group list-group-flush rounded-0" id="student-orders-list">
                             <% orders.forEach(o=> { %>
-                                <li class="list-group-item p-4">
+                                <li class="list-group-item p-3 p-md-4">
 
                                     <div class="d-flex justify-content-between align-items-start mb-2">
                                         <span
@@ -249,7 +291,7 @@
                                         <%= o.orderTime.toLocaleString() %>
                                     </small>
 
-                                    <div class="bg-light-dark rounded-3 p-3 border">
+                                    <div class="bg-light-dark rounded-3 p-2 p-md-3 border">
                                         <ul class="mb-0 ps-3 small text-light">
                                             <% o.items.forEach(i=> { %>
                                                 <li class="mb-1">
@@ -272,14 +314,44 @@
             </div>
         </div>
     </div>
+    
     <audio id="notificationSound" src="https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3"
         preload="auto"></audio>
 
     <script>
-        let knownStatuses = {}; // Tracks the status of orders to detect changes
+        // 1. Unlock Audio on first interaction to bypass browser Autoplay policies
+        document.body.addEventListener('click', function unlockAudio() {
+            const audio = document.getElementById('notificationSound');
+            audio.play().then(() => {
+                audio.pause();
+                audio.currentTime = 0;
+                document.body.removeEventListener('click', unlockAudio);
+                console.log("Audio Unlocked successfully!");
+            }).catch(e => {
+                // Ignore errors
+            });
+        }, { once: true });
+
+        // 2. Menu Search Function
+        function filterMenu() {
+            const input = document.getElementById("menu-search").value.toLowerCase();
+            const rows = document.querySelectorAll(".menu-row");
+
+            rows.forEach(row => {
+                const itemName = row.querySelector(".item-name").textContent.toLowerCase();
+                if (itemName.includes(input)) {
+                    row.style.display = ""; // Show row
+                } else {
+                    row.style.display = "none"; // Hide row
+                }
+            });
+        }
+
+        // 3. Variables for Orders
+        let knownStatuses = {};
         let isFirstLoad = true;
 
-        // Ask the server for updates every 3 seconds
+        // Ask the server for order updates every 3 seconds
         setInterval(fetchStudentOrders, 3000);
 
         async function fetchStudentOrders() {
@@ -295,11 +367,10 @@
 
                 orders.forEach(o => {
                     // --- SOUND LOGIC ---
-                    // If it's not the first load, and the order WAS 'Pending' but is NOW 'Fulfilled'
                     if (!isFirstLoad && knownStatuses[o._id] === 'Pending' && o.status === 'Fulfilled') {
                         statusChanged = true;
                     }
-                    knownStatuses[o._id] = o.status; // Update known status
+                    knownStatuses[o._id] = o.status; 
 
                     // --- HTML BUILDING LOGIC ---
                     const badgeClass = o.status === 'Fulfilled' ? 'bg-success text-white' : 'bg-warning text-dark';
@@ -315,7 +386,7 @@
                     });
 
                     html += `
-                    <li class="list-group-item p-4">
+                    <li class="list-group-item p-3 p-md-4">
                         <div class="d-flex justify-content-between align-items-start mb-2">
                             <span class="badge badge-status ${badgeClass} shadow-sm">${o.status}</span>
                             <strong class="fs-5" style="color: var(--shadow-accent);">₹${o.totalAmount}</strong>
@@ -323,7 +394,7 @@
                         <small class="text-muted d-block mb-3 fw-medium">
                             <i class="fa-regular fa-calendar-days me-1"></i> ${orderDate}
                         </small>
-                        <div class="bg-light-dark rounded-3 p-3 border">
+                        <div class="bg-light-dark rounded-3 p-2 p-md-3 border">
                             <ul class="mb-0 ps-3 small text-light">
                                 ${itemsListHtml}
                             </ul>
@@ -343,6 +414,11 @@
                 console.error("Error fetching student orders:", error);
             }
         }
+
+        // 4. Variables for Coupons
+        let knownCoupons = [];
+        let isFirstCouponLoad = true;
+
         // Poll for active coupons every 3 seconds
         setInterval(fetchActiveCoupons, 3000);
         fetchActiveCoupons(); // Run immediately on load
@@ -353,33 +429,59 @@
                 const coupons = await response.json();
                 const container = document.getElementById('live-coupon-container');
 
+                // If there are no coupons, clear the UI and reset trackers
                 if (coupons.length === 0) {
-                    container.innerHTML = ''; // Clear coupons if order is fulfilled!
+                    container.innerHTML = '';
+                    knownCoupons = [];
+                    isFirstCouponLoad = false;
                     return;
                 }
 
                 let html = '';
+                let newCouponAdded = false;
+                let currentCoupons = [];
+
                 coupons.forEach(coupon => {
+                    currentCoupons.push(coupon.couponCode);
+
+                    // If it's NOT the first load, and this specific coupon code is new, flag it!
+                    if (!isFirstCouponLoad && !knownCoupons.includes(coupon.couponCode)) {
+                        newCouponAdded = true;
+                    }
+
+                    // Responsive flex classes for the coupon card
                     html += `
-            <div class="card bg-dark border-info shadow-lg mb-3" style="border-width: 2px; border-style: dashed;">
-                <div class="card-body d-flex justify-content-between align-items-center p-4">
-                    <div>
-                        <h6 class="text-uppercase text-info fw-bold mb-1">
-                            <i class="fa-solid fa-check-circle me-1"></i> Payment Verified
-                        </h6>
-                        <h2 class="text-white fw-bold mb-0 tracking-wider">
-                            ${coupon.couponCode}
-                        </h2>
-                        <small class="text-muted">Show this code at the counter to collect your food.</small>
-                    </div>
-                    <div class="text-end">
-                        <i class="fa-solid fa-qrcode fa-3x text-info opacity-50"></i>
-                    </div>
-                </div>
-            </div>`;
+                    <div class="card bg-dark border-info shadow-lg mb-3" style="border-width: 2px; border-style: dashed;">
+                        <div class="card-body d-flex flex-column flex-sm-row justify-content-between align-items-center p-3 p-md-4 gap-3 text-center text-sm-start">
+                            <div>
+                                <h6 class="text-uppercase text-info fw-bold mb-1">
+                                    <i class="fa-solid fa-check-circle me-1"></i> Payment Verified
+                                </h6>
+                                <h2 class="text-white fw-bold mb-0 tracking-wider">
+                                    ${coupon.couponCode}
+                                </h2>
+                                <small class="text-muted">Show this code at the counter to collect your food.</small>
+                            </div>
+                            <div class="text-end d-none d-sm-block">
+                                <i class="fa-solid fa-qrcode fa-3x text-info opacity-50"></i>
+                            </div>
+                        </div>
+                    </div>`;
                 });
 
                 container.innerHTML = html;
+
+                // Play the sound if a new coupon was added
+                if (newCouponAdded) {
+                    const audio = document.getElementById('notificationSound');
+                    audio.currentTime = 0; // Force reset the audio to the beginning
+                    audio.play().catch(e => console.log("Audio blocked until user clicks somewhere on the page first."));
+                }
+
+                // Update tracker variables for the next cycle
+                knownCoupons = currentCoupons;
+                isFirstCouponLoad = false;
+
             } catch (error) {
                 console.error("Error fetching coupons:", error);
             }

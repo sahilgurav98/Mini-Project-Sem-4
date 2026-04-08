@@ -47,11 +47,16 @@ export const sendOtp = async (req, res) => {
 
   try {
     const transporter = nodemailer.createTransport({
-      service: "gmail",
+      host:famtcanteen@gmail.com,
+      port:587,
+      secure:false,
       auth: {
         user: process.env.EMAIL_USER,
         pass: process.env.EMAIL_PASS,
       },
+      tls: {
+        rejectUnauthorized: false // Bypasses strict cloud certificate checks
+    },
     });
 
     // Check if student already exists
@@ -142,13 +147,18 @@ export const studentSignup = async (req, res) => {
     // NEW: SEND WELCOME / THANK YOU EMAIL
     // ==========================================
     try {
-      const transporter = nodemailer.createTransport({
-        service: "gmail",
-        auth: {
-          user: process.env.EMAIL_USER,
-          pass: process.env.EMAIL_PASS,
-        },
-      });
+    const transporter = nodemailer.createTransport({
+      host:famtcanteen@gmail.com,
+      port:587,
+      secure:false,
+      auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS,
+      },
+      tls: {
+        rejectUnauthorized: false // Bypasses strict cloud certificate checks
+    },
+    });
 
       await transporter.sendMail({
         from: `"Canteen DAMS Support" <${process.env.EMAIL_USER}>`,
@@ -302,9 +312,17 @@ export const sendForgotPasswordOtp = async (req, res) => {
       return res.status(404).json({ success: false, message: "Email not found in our system." });
     }
 
-    const transporter = nodemailer.createTransport({
-      service: "gmail",
-      auth: { user: process.env.EMAIL_USER, pass: process.env.EMAIL_PASS },
+      const transporter = nodemailer.createTransport({
+      host:famtcanteen@gmail.com,
+      port:587,
+      secure:false,
+      auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS,
+      },
+      tls: {
+        rejectUnauthorized: false // Bypasses strict cloud certificate checks
+    },
     });
 
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
@@ -390,9 +408,17 @@ export const resetPassword = async (req, res) => {
     // ==========================================
     try {
       const transporter = nodemailer.createTransport({
-        service: "gmail",
-        auth: { user: process.env.EMAIL_USER, pass: process.env.EMAIL_PASS },
-      });
+      host:famtcanteen@gmail.com,
+      port:587,
+      secure:false,
+      auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS,
+      },
+      tls: {
+        rejectUnauthorized: false // Bypasses strict cloud certificate checks
+    },
+    });
 
       await transporter.sendMail({
         from: `"Canteen DAMS Security" <${process.env.EMAIL_USER}>`,

@@ -46,6 +46,9 @@ export const sendOtp = async (req, res) => {
   }
 
   try {
+    console.log("Email User:", process.env.EMAIL_USER);
+    console.log("Email Pass Loaded?", process.env.EMAIL_PASS ? "Yes" : "NO!");
+    
     const transporter = nodemailer.createTransport({
       host: 'smtp.gmail.com', // FIXED HERE
       port: 587,

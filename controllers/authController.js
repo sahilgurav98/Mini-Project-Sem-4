@@ -47,16 +47,16 @@ export const sendOtp = async (req, res) => {
 
   try {
     const transporter = nodemailer.createTransport({
-      host:famtcanteen@gmail.com,
-      port:587,
-      secure:false,
+      host: 'smtp.gmail.com', // FIXED HERE
+      port: 587,
+      secure: false,
       auth: {
         user: process.env.EMAIL_USER,
         pass: process.env.EMAIL_PASS,
       },
       tls: {
         rejectUnauthorized: false // Bypasses strict cloud certificate checks
-    },
+      },
     });
 
     // Check if student already exists
@@ -148,16 +148,16 @@ export const studentSignup = async (req, res) => {
     // ==========================================
     try {
     const transporter = nodemailer.createTransport({
-      host:famtcanteen@gmail.com,
-      port:587,
-      secure:false,
+      host: 'smtp.gmail.com', // FIXED HERE
+      port: 587,
+      secure: false,
       auth: {
         user: process.env.EMAIL_USER,
         pass: process.env.EMAIL_PASS,
       },
       tls: {
         rejectUnauthorized: false // Bypasses strict cloud certificate checks
-    },
+      },
     });
 
       await transporter.sendMail({
@@ -299,10 +299,6 @@ export const logout = (req, res) => {
 // PASSWORD RESET LOGIC
 // ==========================================
 
-// ==========================================
-// PASSWORD RESET LOGIC
-// ==========================================
-
 export const sendForgotPasswordOtp = async (req, res) => {
   const { email } = req.body;
 
@@ -313,16 +309,16 @@ export const sendForgotPasswordOtp = async (req, res) => {
     }
 
       const transporter = nodemailer.createTransport({
-      host:famtcanteen@gmail.com,
-      port:587,
-      secure:false,
+      host: 'smtp.gmail.com', // FIXED HERE
+      port: 587,
+      secure: false,
       auth: {
         user: process.env.EMAIL_USER,
         pass: process.env.EMAIL_PASS,
       },
       tls: {
         rejectUnauthorized: false // Bypasses strict cloud certificate checks
-    },
+      },
     });
 
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
@@ -408,16 +404,16 @@ export const resetPassword = async (req, res) => {
     // ==========================================
     try {
       const transporter = nodemailer.createTransport({
-      host:famtcanteen@gmail.com,
-      port:587,
-      secure:false,
+      host: 'smtp.gmail.com', // FIXED HERE
+      port: 587,
+      secure: false,
       auth: {
         user: process.env.EMAIL_USER,
         pass: process.env.EMAIL_PASS,
       },
       tls: {
         rejectUnauthorized: false // Bypasses strict cloud certificate checks
-    },
+      },
     });
 
       await transporter.sendMail({

@@ -13,6 +13,7 @@ import authRoutes from './routes/authRoutes.js';
 import studentRoutes from './routes/studentRoutes.js';
 import adminRoutes from './routes/adminRoutes.js';
 import { homedir } from 'os';
+import { cos } from '@tensorflow/tfjs';
 
 // Environment variables configuration
 dotenv.config();

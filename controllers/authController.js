@@ -62,7 +62,6 @@ export const sendOtp = async (req, res) => {
 
     // Send the formal email
     await sendMail({
-      from: `"Canteen DAMS Support" <${process.env.EMAIL_USER}>`,
       to: email,
       subject: "Action Required: Canteen Portal Account Verification",
       html: `
@@ -139,7 +138,6 @@ export const studentSignup = async (req, res) => {
     // ==========================================
     try {
       await sendMail({
-        from: `"Canteen DAMS Support" <${process.env.EMAIL_USER}>`,
         to: email,
         subject: "Welcome to Canteen DAMS - Registration Successful",
         html: `
@@ -293,7 +291,6 @@ export const sendForgotPasswordOtp = async (req, res) => {
     req.session.resetExpires = Date.now() + 5 * 60 * 1000;
 
     await sendMail({
-      from: `"Canteen DAMS Security" <${process.env.EMAIL_USER}>`,
       to: email,
       subject: "Action Required: Password Reset Request",
       html: `
@@ -373,7 +370,6 @@ export const resetPassword = async (req, res) => {
     // ==========================================
     try {
       await sendMail({
-        from: `"Canteen DAMS Security" <${process.env.EMAIL_USER}>`,
         to: email,
         subject: "Security Update: Password Successfully Changed",
         html: `

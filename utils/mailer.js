@@ -1,53 +1,83 @@
-import nodemailer from 'nodemailer';
+import dotenv from "dotenv";
+dotenv.config();
 
-const smtpPort = Number(process.env.SMTP_PORT || 465);
-const smtpSecure = process.env.SMTP_SECURE
-    ? process.env.SMTP_SECURE === 'true'
-    : smtpPort === 465;
 
-let transporterPromise;
+import SibApiV3Sdk from 'sib-api-v3-sdk';
 
-const createTransporter = async () => {
-    if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
-        throw new Error('Email credentials are missing. Set EMAIL_USER and EMAIL_PASS.');
+// Configure Brevo API
+const client = SibApiV3Sdk.ApiClient.instance;
+client.authentications['api-key'].apiKey = process.env.BREVO_API_KEY;
+
+let apiInstance;
+
+/**
+ * Initialize Brevo transporter
+ */
+const getTransporter = () => {
+    if (!process.env.BREVO_API_KEY) {
+        throw new Error(
+            'BREVO_API_KEY missing. Add it to environment variables.'
+        );
     }
 
-    const transporter = nodemailer.createTransport({
-        service: process.env.SMTP_SERVICE || 'gmail',
-        host: process.env.SMTP_HOST || undefined,
-        port: smtpPort,
-        secure: smtpSecure,
-        auth: {
-            user: process.env.EMAIL_USER,
-            pass: process.env.EMAIL_PASS
-        },
-        connectionTimeout: 20000,
-        greetingTimeout: 20000,
-        socketTimeout: 30000
-    });
+    if (!process.env.EMAIL_USER) {
+        throw new Error(
+            'EMAIL_USER missing. Add verified sender email.'
+        );
+    }
 
-    await transporter.verify();
-    return transporter;
+    if (!apiInstance) {
+        apiInstance = new SibApiV3Sdk.TransactionalEmailsApi();
+    }
+
+    return apiInstance;
 };
 
-const getTransporter = async () => {
-    if (!transporterPromise) {
-        transporterPromise = createTransporter().catch((error) => {
-            transporterPromise = null;
-            throw error;
+/**
+ * Send email function (OTP / verification / reset password etc.)
+ */
+export const sendMail = async ({
+    to,
+    subject,
+    html
+}) => {
+    const transporter = getTransporter();
+
+    try {
+        const result = await transporter.sendTransacEmail({
+            sender: {
+                email: process.env.EMAIL_USER
+            },
+            to: [
+                {
+                    email: to
+                }
+            ],
+            subject: subject,
+            htmlContent: html
         });
+
+        return result;
+    } catch (error) {
+        console.error('Brevo Email Error:', error.message);
+        throw error;
     }
-
-    return transporterPromise;
 };
 
-export const sendMail = async (mailOptions) => {
-    const transporter = await getTransporter();
-    return transporter.sendMail(mailOptions);
-};
-
+/**
+ * Build app URL helper
+ */
 export const buildAppUrl = (path = '/') => {
-    const baseUrl = (process.env.APP_BASE_URL || process.env.RENDER_EXTERNAL_URL || 'http://localhost:3000').replace(/\/$/, '');
-    const normalizedPath = path.startsWith('/') ? path : `/${path}`;
+    const baseUrl = (
+        process.env.APP_BASE_URL ||
+        process.env.RENDER_EXTERNAL_URL ||
+        'http://localhost:3000'
+    ).replace(/\/$/, '');
+
+    const normalizedPath = path.startsWith('/')
+        ? path
+        : `/${path}`;
+
     return `${baseUrl}${normalizedPath}`;
 };
+

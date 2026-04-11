@@ -38,10 +38,12 @@ export const trainFNN = async (filePath) => {
 
     model.compile({ optimizer: tf.train.adam(0.01), loss: 'meanSquaredError', metrics: ['mae'] });
 
-    await model.fit(xs, ys, { epochs: 100, shuffle: true, validationSplit: 0.1 });
+    const history = await model.fit(xs, ys, { epochs: 100, shuffle: true, validationSplit: 0.1 });
+
+    const finalMae = history.history.mae ? history.history.mae[history.history.mae.length - 1] : null;
 
     // Save BOTH the model and the dynamically discovered item list to RAM!
-    setModel(model, dynamicItemsList);
+    setModel(model, dynamicItemsList, finalMae);
 
     xs.dispose();
     ys.dispose();

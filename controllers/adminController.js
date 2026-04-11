@@ -1,6 +1,7 @@
 import Product from "../models/Product.js";
 import Order from "../models/Order.js";
-import { activeModel } from "../ml/modelStore.js"; // <-- Import the RAM store
+import Admin from "../models/Admin.js";
+import { activeModel, activeMae } from "../ml/modelStore.js"; // <-- Import the RAM store
 
 const ACTIVE_QUEUE_STATUSES = ["Pending"];
 const LIVE_ORDERS_LIMIT = 15;
@@ -38,12 +39,17 @@ export const getDashboard = async (req, res) => {
   // Check if the model exists in RAM right now
   const isModelTrained = activeModel !== null;
 
+  const adminDoc = await Admin.findOne({});
+  const eventActive = adminDoc ? adminDoc.eventActive : false;
+
   res.render("admin/dashboard", {
+    eventActive,
     products,
     orders,
     prediction: null,
     error: null,
     isModelTrained, // <-- Pass it to the EJS file
+    activeMae,
     queueLimit: QUEUE_LIMIT,
     activeQueueCount,
     analytics: {
@@ -229,5 +235,22 @@ export const issueCoupon = async (req, res) => {
     } catch (error) {
         console.error("Error issuing coupon:", error);
         res.redirect('/admin/dashboard?error=Failed to issue coupon');
+    }
+};
+
+export const toggleEventStatus = async (req, res) => {
+    try {
+        let adminDoc = await Admin.findOne({});
+        // Handle case where admin is already authenticated but doc was missing
+        if (!adminDoc) {
+            adminDoc = new Admin({ username: 'admin', password: 'password', eventActive: true });
+        } else {
+            adminDoc.eventActive = !adminDoc.eventActive;
+        }
+        await adminDoc.save();
+        res.redirect("/admin/dashboard");
+    } catch (error) {
+        console.error("Toggle Event Error:", error);
+        res.redirect("/admin/dashboard?error=Failed to toggle event");
     }
 };

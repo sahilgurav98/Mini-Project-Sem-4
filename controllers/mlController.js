@@ -2,7 +2,7 @@ import { trainFNN } from '../ml/trainModel.js';
 import { predict } from '../ml/predictDemand.js';
 import Product from '../models/Product.js';
 import Order from '../models/Order.js';
-import { activeModel } from '../ml/modelStore.js'; // <-- Import the RAM store
+import { activeModel, activeMae } from '../ml/modelStore.js'; // <-- Import the RAM store
 
 const QUEUE_LIMIT = Number(process.env.ORDER_QUEUE_LIMIT || 10);
 
@@ -31,6 +31,7 @@ const buildAdminViewData = async () => {
         products,
         orders,
         isModelTrained: activeModel !== null,
+        activeMae,
         activeQueueCount,
         queueLimit: QUEUE_LIMIT,
         analytics: {

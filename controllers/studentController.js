@@ -1,6 +1,7 @@
 import Product from '../models/Product.js';
 import Order from '../models/Order.js';
 import Student from '../models/Student.js'; // <-- Add this line
+import Admin from '../models/Admin.js';
 
 const ACTIVE_QUEUE_STATUSES = ['Pending'];
 const QUEUE_LIMIT = Number(process.env.ORDER_QUEUE_LIMIT || 10);
@@ -42,6 +43,9 @@ export const placeOrder = async (req, res) => {
             });
         }
 
+        const adminDoc = await Admin.findOne({});
+        const currentEventStatus = adminDoc?.eventActive ? 'yes' : 'no';
+
         // Save order to DB
         const newOrder = await Order.create({
             studentId: student._id,
@@ -51,6 +55,7 @@ export const placeOrder = async (req, res) => {
             branch: student.branch,
             items: cartItems,
             totalAmount: totalAmount,
+            event: currentEventStatus,
             statusUpdatedAt: new Date()
         });
 

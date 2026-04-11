@@ -346,7 +346,11 @@ export const sendForgotPasswordOtp = async (req, res) => {
 };
 
 export const resetPassword = async (req, res) => {
-  const { email, otp, newPassword } = req.body;
+  const { email, otp, newPassword, confirmPassword } = req.body;
+
+  if (newPassword !== confirmPassword) {
+    return res.render("student/forgot-password", { error: "Passwords do not match." });
+  }
 
   if (
     !req.session.resetOtp ||

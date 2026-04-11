@@ -14,6 +14,7 @@ const orderSchema = new mongoose.Schema({
     }],
     totalAmount: Number,
     status: { type: String, enum: ['Pending', 'Rejected', 'Fulfilled', 'Cancelled'], default: 'Pending' },
+    event: { type: String, enum: ['yes', 'no'], default: 'no' },
     orderTime: { type: Date, default: Date.now },
     paymentStatus: { type: String, enum: ['Unpaid', 'Paid'], default: 'Unpaid' },
     couponCode: { type: String, default: null },

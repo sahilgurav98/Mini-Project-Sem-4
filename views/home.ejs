@@ -353,12 +353,8 @@
     
     <div id="chat-body" class="chat-body p-3">
         <div class="bot-message mb-3">
-            Hello! I am the CDMS AI Assistant. 🤖<br><br>
-            Here is what you can ask me about:<br>
-            <span class="text-info">•</span> <b>Ordering & Coupons:</b> "How do I pay?"<br>
-            <span class="text-info">•</span> <b>The AI Model:</b> "How does the AI forecast demand?"<br>
-            <span class="text-info">•</span> <b>Our Tech Stack:</b> "What database do you use?"<br>
-            <span class="text-info">•</span> <b>Our Team:</b> "Who built this system?"<br><br>
+            Hello! I am the Canteen DAMS AI Assistant. 🤖<br><br>
+            
             How can I help you today?
         </div>
     </div>
@@ -481,53 +477,6 @@
 </style>
 
 <script>
-    const knowledgeBase = [
-        {
-            keywords: ["who built", "team", "developed", "creators", "author", "made"],
-            answer: "This system was engineered by Sahil Gurav, Kanva Deolekar, Harshwardhan Jadhav, and Sujal Bondkar from the CSE (AIML) department."
-        },
-        {
-            keywords: ["what is", "cdms", "about", "project"],
-            answer: "CDMS (Canteen Demand & Management System) is an intelligent platform designed to eliminate physical queues via asynchronous preordering and reduce food waste using AI demand forecasting."
-        },
-        {
-            keywords: ["how to order", "place order", "buy food", "student"],
-            answer: "It's easy! Log in to the Student Dashboard, browse the dynamic menu, set your quantities, and hit 'Confirm Order'. The entire process is AJAX-powered, so there are no page reloads."
-        },
-        {
-            keywords: ["pay", "payment", "coupon", "verify", "ticket"],
-            answer: "After placing an order online, you pay at the physical counter. The admin will click 'Issue Coupon', and a glowing digital ticket will asynchronously appear on your dashboard to verify your payment!"
-        },
-        {
-            keywords: ["ai", "machine learning", "predict", "forecast", "model"],
-            answer: "We built a Feedforward Neural Network (FNN) using TensorFlow.js. It runs natively in the Node.js backend. It analyzes past data to tell the kitchen exactly how many plates of each item to cook tomorrow."
-        },
-        {
-            keywords: ["features", "input", "data", "train"],
-            answer: "The AI takes 6 core features: Day of the Week, Meal Time, Item Name, Price, Average Sales, and Event Status. We use Dynamic One-Hot Encoding to process the categorical data."
-        },
-        {
-            keywords: ["one hot", "encoding", "dimension"],
-            answer: "Because neural networks only understand math, we use Dynamic One-Hot Encoding to turn text (like the 'Samosa' item name) into binary nodes (0s and 1s). This expands the dimensionality of our input layer automatically."
-        },
-        {
-            keywords: ["waste", "shortage", "food", "why ai"],
-            answer: "Traditional canteens rely on guesswork, leading to massive food waste or sudden shortages. Our AI shifts the kitchen from 'reactive cooking' to 'predictive cooking', saving money and resources."
-        },
-        {
-            keywords: ["admin", "management", "kitchen", "staff"],
-            answer: "The Admin Console acts as a live command center. It uses API polling to pull in new student orders in real-time. The admin can issue coupons, mark orders as fulfilled, and trigger the AI training pipeline."
-        },
-        {
-            keywords: ["tech", "stack", "database", "backend", "frontend"],
-            answer: "The frontend uses EJS, Bootstrap 5, and AJAX. The backend is built on Node.js and Express.js. We use MongoDB for our database and TensorFlow.js for the machine learning module."
-        },
-        {
-            keywords: ["hello", "hi", "hey", "greetings"],
-            answer: "Hello there! How can I help you understand the CDMS project today? You can ask me about our AI, the digital coupons, or the tech stack!"
-        }
-    ];
-
     function toggleChat() {
         const chatWindow = document.getElementById('chatbot-window');
         chatWindow.style.display = chatWindow.style.display === 'flex' ? 'none' : 'flex';
@@ -542,33 +491,54 @@
         if (event.key === 'Enter') sendMessage();
     }
 
-    function sendMessage() {
+    async function sendMessage() {
         const inputField = document.getElementById('chat-input');
-        const userText = inputField.value.trim().toLowerCase();
+        const userText = inputField.value.trim();
         if (!userText) return;
 
-        appendMessage(inputField.value.trim(), 'user-message');
+        appendMessage(userText, 'user-message');
         inputField.value = '';
 
-        let botResponse = "I'm sorry, I don't have the exact answer for that. Try asking me about our **Tech Stack**, the **AI Model**, or how the **Digital Coupons** work!";
-        
-        for (let entry of knowledgeBase) {
-            if (entry.keywords.some(keyword => userText.includes(keyword))) {
-                botResponse = entry.answer;
-                break; 
-            }
-        }
+        // Added loading indicator
+        const loadingDiv = document.createElement('div');
+        loadingDiv.className = 'bot-message mb-3 shadow-sm';
+        loadingDiv.id = 'chat-loading';
+        loadingDiv.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Thinking...';
+        const chatBody = document.getElementById('chat-body');
+        chatBody.appendChild(loadingDiv);
+        chatBody.scrollTop = chatBody.scrollHeight;
 
-        setTimeout(() => {
-            appendMessage(botResponse, 'bot-message');
-        }, 500);
+        try {
+            const response = await fetch('/api/chat', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ message: userText })
+            });
+            const data = await response.json();
+            
+            const loadingEl = document.getElementById('chat-loading');
+            if (loadingEl) loadingEl.remove();
+
+            appendMessage(data.reply, 'bot-message');
+        } catch (error) {
+            console.error("Chat error:", error);
+            const loadingEl = document.getElementById('chat-loading');
+            if (loadingEl) loadingEl.remove();
+            appendMessage("Sorry, I'm having trouble connecting to the server.", 'bot-message');
+        }
     }
 
     function appendMessage(text, className) {
         const chatBody = document.getElementById('chat-body');
         const messageDiv = document.createElement('div');
         messageDiv.className = className + ' mb-3 shadow-sm';
-        messageDiv.innerHTML = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+        
+        // Basic Markdown replacement: Bold and Newlines
+        let formattedText = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+        formattedText = formattedText.replace(/\*(.*?)\*/g, '<em>$1</em>');
+        formattedText = formattedText.replace(/\n/g, '<br>');
+        
+        messageDiv.innerHTML = formattedText;
         chatBody.appendChild(messageDiv);
         chatBody.scrollTop = chatBody.scrollHeight;
     }

@@ -207,6 +207,16 @@
                 <i class="fa-solid fa-server fa-2x me-3" style="color: var(--admin-accent);"></i>
                 <h2 class="mb-0 fw-bold text-white">Admin Dashboard</h2>
             </div>
+            <div class="d-flex align-items-center gap-3">
+                <% if(eventActive) { %>
+                    <span class="badge bg-success bg-opacity-25 text-success border border-success px-3 py-2 fw-bold" style="letter-spacing: 1px;"><i class="fa-solid fa-bolt me-1"></i> EVENT ACTIVE</span>
+                <% } else { %>
+                    <span class="badge bg-secondary bg-opacity-25 text-secondary border border-secondary px-3 py-2 fw-bold" style="letter-spacing: 1px;">EVENT OFFLINE</span>
+                <% } %>
+                <form action="/admin/toggle-event" method="POST" class="m-0">
+                    <button type="submit" class="btn btn-sm btn-outline-light shadow-sm fw-bold">Toggle Event Mode</button>
+                </form>
+            </div>
         </div>
 
         <div class="row g-3 g-lg-4 mb-2">
@@ -277,7 +287,7 @@
                                 <span class="fw-bold text-white"><%= activeQueueCount %>/<%= queueLimit %></span>
                             </div>
                             <div class="progress mb-4" style="height: 10px; background-color: rgba(255,255,255,0.08);">
-                                <div class="progress-bar <%= activeQueueCount < queueLimit ? 'bg-success' : 'bg-danger' %>" style="width: <%= Math.min((activeQueueCount / queueLimit) * 100, 100) %> %"></div>
+                                <div class="progress-bar <%= activeQueueCount < queueLimit ? 'bg-success' : 'bg-danger' %>" style="width: <%= Math.min((activeQueueCount / queueLimit) * 100, 100) %>%"></div>
                             </div>
                             <div class="small text-muted mb-2">Paid conversion</div>
                             <div class="fw-bold text-info mb-3"><%= analytics.totalOrders ? Math.round((analytics.paidOrders / analytics.totalOrders) * 100) : 0 %>%</div>
@@ -299,6 +309,11 @@
                     <span class="badge bg-success bg-opacity-25 text-success-custom border border-success badge-status">
                         <i class="fa-solid fa-circle-check me-1"></i> MODEL ONLINE
                     </span>
+                    <% if(activeMae !== null && activeMae !== undefined) { %>
+                    <span class="badge bg-info bg-opacity-25 text-info border border-info badge-status ms-2">
+                        MAE: <%= parseFloat(activeMae).toFixed(3) %>
+                    </span>
+                    <% } %>
                     <% } else { %>
                         <span class="badge bg-danger bg-opacity-25 text-danger border border-danger badge-status">
                             <i class="fa-solid fa-circle-xmark me-1"></i> OFFLINE (NEEDS DATA)

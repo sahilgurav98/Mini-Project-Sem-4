@@ -2,7 +2,7 @@ import express from 'express';
 import multer from 'multer';
 import { downloadTrainingData } from '../controllers/adminController.js';
 import { isAdmin } from '../middleware/authMiddleware.js';
-import { getDashboard, addProduct, deleteProduct, toggleProductAvailability, fulfillOrder, rejectOrder, deleteOrder, clearAllOrders, getLiveOrders ,issueCoupon} from '../controllers/adminController.js';
+import { toggleEventStatus, getDashboard, addProduct, deleteProduct, toggleProductAvailability, fulfillOrder, rejectOrder, deleteOrder, clearAllOrders, getLiveOrders ,issueCoupon} from '../controllers/adminController.js';
 import { uploadDatasetAndTrain, runPrediction } from '../controllers/mlController.js';
 
 const upload = multer({ dest: 'uploads/' });
@@ -11,6 +11,7 @@ const router = express.Router();
 router.use(isAdmin); // Protect all routes
 
 router.get('/dashboard', getDashboard);
+router.post('/toggle-event', toggleEventStatus);
 
 // Product Management
 router.post('/product/add', addProduct);

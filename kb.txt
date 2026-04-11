@@ -1,0 +1,30 @@
+The canteen operates from Monday to Saturday, between 8:00 AM and 5:00 PM. It remains closed on Sundays and public holidays.
+Breakfast is served from 8:00 AM to 11:00 AM. Lunch is available from 12:00 PM to 3:00 PM. Evening snacks are served between 3:30 PM and 5:00 PM.
+The canteen is located on the ground floor of the engineering main building, right next to the student recreation center.
+If a student forgets their password, they can click on 'Forgot Password' on the login screen. They will need to provide their registered email address.
+During the password reset process, users must enter a new password and confirm it in the 'Confirm Password' field to ensure no typos were made.
+Students can update their profile information, including dietary preferences, from the settings page inside the Student Dashboard.
+Once an order is placed on the dashboard, it is placed in a 'Pending' queue. A student can cancel their order within 5 minutes of placing it without any penalty.
+If an order is already marked as 'Preparing' or a coupon has been issued by the admin, it cannot be canceled.
+Refunds for canceled pre-orders are processed back to the student's digital wallet within 24 hours. The canteen does not provide physical cash refunds for online wallet transactions.
+A standard veg thali costs ₹60 and includes 2 rotis, a vegetable curry, dal, rice, and a sweet. It is the most popular item during lunch hours.
+Snacks such as Samosas (₹15), Vada Pav (₹15), and Poha (₹20) are available all day but are in highest demand during morning and evening breaks.
+Beverages include Tea (₹10), Coffee (₹15), and Cold Drinks (₹20). Cold drinks are subject to availability.
+During campus fests or specific college events, the admin toggles the 'Event Status' on the dashboard. This allows the AI to adjust predictions for higher foot traffic.
+On event days, the canteen offers a specialized fast-food menu to handle high crowd volumes quickly, temporarily pausing complex thali preparation.
+Students can track the real-time status of their food orders directly from their dashboard, keeping them updated during busy event days.
+The machine learning model's performance is measured using Mean Absolute Error (MAE), which represents the average difference between the predicted food demand and the actual sales.
+The MAE metric is prominently displayed on the Admin Dashboard so the canteen manager can monitor how accurate the AI predictions are.
+As the AI gathers more daily sales data over time, it retrains itself during off-hours, continuously lowering the MAE and making estimations more accurate.
+The Canteen Demand & Management System (Canteen DAMS) was developed and engineered by Sahil Gurav, Kanva Deolekar, Sujal Bondkar, and Harshawardhan Jadhav. They are students from the CSE (AIML) department.
+Admin Manual - Viewing Orders: The Admin Dashboard displays all incoming student orders in real-time. Orders initially appear in the 'Pending' state.
+Admin Manual - Order Verification: When a student pays at the physical counter, the admin must locate their order on the dashboard and click 'Issue Coupon'. This verifies payment and moves the order to the kitchen's list.
+Admin Manual - Order Status Updates: Once the food is ready, the admin updates the order status to 'Ready'. The student will receive a notification on their dashboard to pick up their food.
+Admin Manual - Event Status: The admin has access to an 'Event Status' toggle on the dashboard. During college fests, holidays, or special gatherings, the admin must turn this toggle ON. 
+Admin Manual - Why Event Status Matters: Turning on the Event Status informs the Machine Learning model that foot traffic will be anomalous, preventing the AI from under-predicting food demand for that day.
+Admin Manual - AI Predictions: The admin can view tomorrow's predicted food demand directly on the dashboard. This tells the kitchen staff exactly how many units of each item to prepare.
+Admin Manual - Checking MAE: The dashboard displays the Mean Absolute Error (MAE) of the Machine Learning model. A lower MAE means the AI's food predictions are highly accurate. If the MAE gets too high, the admin should trigger a model retraining.
+Admin Manual - Training the AI: The admin can click the 'Train Model' button at the end of the week. This feeds the latest order history into the neural network, helping it learn changing student preferences.
+Admin Manual - AI Predictions: The admin can view tomorrow's predicted food demand directly on the dashboard. This tells the kitchen staff exactly how many units of each item to prepare.
+Admin Manual - Checking MAE: The dashboard displays the Mean Absolute Error (MAE) of the Machine Learning model. A lower MAE means the AI's food predictions are highly accurate. If the MAE gets too high, the admin should trigger a model retraining.
+Admin Manual - Training the AI: The admin can click the 'Train Model' button at the end of the week. This feeds the latest order history into the neural network, helping it learn changing student preferences.

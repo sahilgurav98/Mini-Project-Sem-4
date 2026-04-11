@@ -1,0 +1,207 @@
+<button id="chatbot-toggle" class="btn btn-primary shadow-lg d-flex justify-content-center align-items-center" onclick="toggleChat()">
+    <i class="fa-solid fa-robot fa-lg"></i>
+</button>
+
+<div id="chatbot-window" class="shadow-lg">
+    <div class="chat-header d-flex justify-content-between align-items-center">
+        <div>
+            <i class="fa-solid fa-microchip me-2 text-info"></i>
+            <span class="fw-bold">CDMS AI Assistant</span>
+        </div>
+        <button class="btn btn-sm text-white border-0 bg-transparent" onclick="toggleChat()">
+            <i class="fa-solid fa-xmark fa-lg"></i>
+        </button>
+    </div>
+    
+    <div id="chat-body" class="chat-body p-3">
+        <div class="bot-message mb-3">
+            Hello! I am the Canteen DAMS AI Assistant. 🤖<br><br>
+            
+            How can I help you today?
+        </div>
+    </div>
+    
+    <div class="chat-footer p-2 border-top border-secondary d-flex bg-dark">
+        <input type="text" id="chat-input" class="form-control form-control-sm bg-dark text-white border-secondary me-2" placeholder="Type your question here..." autocomplete="off" onkeypress="handleEnter(event)">
+        <button class="btn btn-sm btn-info fw-bold d-flex justify-content-center align-items-center px-3" onclick="sendMessage()">
+            <i class="fa-solid fa-paper-plane"></i>
+        </button>
+    </div>
+</div>
+
+<style>
+    /* Chatbot Button Default (Desktop) */
+    #chatbot-toggle {
+        position: fixed;
+        bottom: 30px;
+        right: 30px;
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        background: var(--shadow-accent, #7c3aed);
+        border: none;
+        z-index: 9999;
+        transition: transform 0.3s ease;
+        box-shadow: 0 0 20px rgba(124, 58, 237, 0.5);
+    }
+    
+    #chatbot-toggle:hover {
+        transform: scale(1.1);
+        background: #6d28d9;
+    }
+
+    /* Chatbot Window Default (Desktop) */
+    #chatbot-window {
+        position: fixed;
+        bottom: 100px;
+        right: 30px;
+        width: 380px;
+        height: 500px;
+        background: #1e1e2f;
+        border: 1px solid rgba(124, 58, 237, 0.3);
+        border-radius: 15px;
+        display: none; 
+        flex-direction: column;
+        z-index: 9999;
+        overflow: hidden;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.8);
+    }
+
+    /* --- RESPONSIVE MEDIA QUERIES --- */
+    /* Adjusts for Mobile Phones */
+    @media (max-width: 576px) {
+        #chatbot-window {
+            width: 90vw; /* 90% of screen width */
+            height: 70vh; /* 70% of screen height */
+            right: 5vw;   /* Center it slightly */
+            bottom: 90px;
+        }
+        
+        #chatbot-toggle {
+            bottom: 20px;
+            right: 20px;
+            width: 55px;
+            height: 55px;
+        }
+    }
+
+    /* Adjusts for very small phones */
+    @media (max-width: 380px) {
+        #chatbot-window {
+            width: 95vw;
+            right: 2.5vw;
+        }
+    }
+    /* -------------------------------- */
+
+    .chat-header {
+        background: rgba(0, 0, 0, 0.6);
+        padding: 15px;
+        border-bottom: 1px solid rgba(124, 58, 237, 0.3);
+        color: white;
+    }
+
+    .chat-body {
+        flex-grow: 1;
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        background: #1e1e2f;
+    }
+
+    .chat-body::-webkit-scrollbar { width: 6px; }
+    .chat-body::-webkit-scrollbar-thumb { background: #7c3aed; border-radius: 3px; }
+
+    .bot-message {
+        background: rgba(124, 58, 237, 0.15);
+        border-left: 3px solid #7c3aed;
+        padding: 12px 15px;
+        border-radius: 0 12px 12px 12px;
+        font-size: 0.9rem;
+        color: #e2e8f0;
+        max-width: 90%;
+        align-self: flex-start;
+        line-height: 1.5;
+    }
+
+    .user-message {
+        background: rgba(56, 189, 248, 0.15);
+        border-right: 3px solid #38bdf8;
+        padding: 10px 15px;
+        border-radius: 12px 0 12px 12px;
+        font-size: 0.9rem;
+        color: #e2e8f0;
+        max-width: 85%;
+        align-self: flex-end;
+        line-height: 1.4;
+    }
+</style>
+
+<script>
+    function toggleChat() {
+        const chatWindow = document.getElementById('chatbot-window');
+        chatWindow.style.display = chatWindow.style.display === 'flex' ? 'none' : 'flex';
+        
+        // Auto-focus input when opened on desktop
+        if (chatWindow.style.display === 'flex' && window.innerWidth > 576) {
+            document.getElementById('chat-input').focus();
+        }
+    }
+
+    function handleEnter(event) {
+        if (event.key === 'Enter') sendMessage();
+    }
+
+    async function sendMessage() {
+        const inputField = document.getElementById('chat-input');
+        const userText = inputField.value.trim();
+        if (!userText) return;
+
+        appendMessage(userText, 'user-message');
+        inputField.value = '';
+
+        // Added loading indicator
+        const loadingDiv = document.createElement('div');
+        loadingDiv.className = 'bot-message mb-3 shadow-sm';
+        loadingDiv.id = 'chat-loading';
+        loadingDiv.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Thinking...';
+        const chatBody = document.getElementById('chat-body');
+        chatBody.appendChild(loadingDiv);
+        chatBody.scrollTop = chatBody.scrollHeight;
+
+        try {
+            const response = await fetch('/api/chat', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ message: userText })
+            });
+            const data = await response.json();
+            
+            const loadingEl = document.getElementById('chat-loading');
+            if (loadingEl) loadingEl.remove();
+
+            appendMessage(data.reply, 'bot-message');
+        } catch (error) {
+            console.error("Chat error:", error);
+            const loadingEl = document.getElementById('chat-loading');
+            if (loadingEl) loadingEl.remove();
+            appendMessage("Sorry, I'm having trouble connecting to the server.", 'bot-message');
+        }
+    }
+
+    function appendMessage(text, className) {
+        const chatBody = document.getElementById('chat-body');
+        const messageDiv = document.createElement('div');
+        messageDiv.className = className + ' mb-3 shadow-sm';
+        
+        // Basic Markdown replacement: Bold and Newlines
+        let formattedText = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+        formattedText = formattedText.replace(/\*(.*?)\*/g, '<em>$1</em>');
+        formattedText = formattedText.replace(/\n/g, '<br>');
+        
+        messageDiv.innerHTML = formattedText;
+        chatBody.appendChild(messageDiv);
+        chatBody.scrollTop = chatBody.scrollHeight;
+    }
+</script>

@@ -68,3 +68,46 @@ async function submitOrder() {
         console.error(err);
     }
 }
+
+// ==========================================
+// PWA & Service Worker Registration Logic
+// ==========================================
+let deferredPrompt;
+
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js')
+            .then(reg => console.log('Service Worker registered successfully!', reg.scope))
+            .catch(err => console.error('Service Worker registration failed:', err));
+    });
+}
+
+// Capture the install prompt event
+window.addEventListener('beforeinstallprompt', (e) => {
+    // Prevent Chrome 67 and earlier from automatically showing the prompt
+    e.preventDefault();
+    // Stash the event so it can be triggered later.
+    deferredPrompt = e;
+    
+    // Show the custom install button in the UI
+    const installBtn = document.getElementById('install-pwa-btn');
+    if (installBtn) {
+        installBtn.style.display = 'flex';
+        installBtn.classList.remove('d-none');
+    }
+});
+
+async function installPWA() {
+    if (!deferredPrompt) return;
+    deferredPrompt.prompt();
+    const { outcome } = await deferredPrompt.userChoice;
+    console.log(`User response to the install prompt: ${outcome}`);
+    deferredPrompt = null;
+    
+    // Hide the button once installed
+    const installBtn = document.getElementById('install-pwa-btn');
+    if (installBtn) {
+        installBtn.style.display = 'none';
+        installBtn.classList.add('d-none');
+    }
+}

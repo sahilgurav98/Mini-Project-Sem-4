@@ -8,6 +8,7 @@
 
     <meta name="theme-color" content="#6a0dad">
 
+    <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Canteen DAMS">
@@ -150,6 +151,11 @@
                                 <%= user.name || user.username %>
                             </span></span>
                     </div>
+
+                    <button id="install-pwa-btn" onclick="installPWA()" class="btn btn-sm header-btn px-3 py-2 fw-bold shadow-sm d-none" style="border-color: #38bdf8; color: #38bdf8; background: rgba(56, 189, 248, 0.1);">
+                        <i class="fa-solid fa-download"></i>
+                        <span>Install App</span>
+                    </button>
 
                     <% if (user.email) { %>
                         <a href="/student/profile"

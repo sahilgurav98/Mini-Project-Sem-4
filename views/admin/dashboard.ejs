@@ -1056,9 +1056,11 @@
         }
 
         async function submitAdminForm(form) {
-            const submitButton = form.querySelector('button[type="submit"]');
+            const submitButton = form.querySelector('button[type="submit"], button:not([type])');
             const isTrainingForm = form.action.includes('/admin/ml/train');
+            const isPredictionForm = form.action.includes('/admin/ml/predict');
             const originalButtonHtml = submitButton ? submitButton.innerHTML : '';
+            const wasButtonDisabled = submitButton ? submitButton.disabled : false;
             if (submitButton) submitButton.disabled = true;
 
             if (isTrainingForm && submitButton) {
@@ -1079,6 +1081,33 @@
                                 <strong class="d-block">Training in Progress</strong>
                                 <span>The model is buffering training data and learning patterns. Please wait a moment.</span>
                             </div>
+                        </div>`;
+                }
+            }
+
+            if (isPredictionForm && submitButton) {
+                submitButton.classList.add('training-pulse');
+                submitButton.innerHTML = '<i class="fa-solid fa-spinner fa-spin me-2"></i> GENERATING PREDICTION...';
+                const feedback = document.getElementById('ai-feedback-area');
+                const prediction = document.getElementById('prediction-result');
+
+                if (feedback) {
+                    feedback.innerHTML = `
+                        <div class="alert alert-info d-flex align-items-center rounded-3 shadow-sm border border-info border-opacity-25 bg-dark text-info mb-5 p-3">
+                            <div class="bg-info bg-opacity-10 p-2 rounded-circle me-3"><i class="fa-solid fa-spinner fa-spin fs-5"></i></div>
+                            <div>
+                                <strong class="d-block">Prediction in Progress</strong>
+                                <span>The AI model is buffering your inputs and generating demand. Please wait a moment.</span>
+                            </div>
+                        </div>`;
+                }
+
+                if (prediction) {
+                    prediction.innerHTML = `
+                        <div class="mt-5 p-5 rounded-4 text-center border border-info border-opacity-25 bg-dark text-info">
+                            <i class="fa-solid fa-spinner fa-spin fs-1 mb-3"></i>
+                            <h5 class="text-uppercase fw-bold mb-1">Generating Prediction</h5>
+                            <div class="text-muted">Processing model output...</div>
                         </div>`;
                 }
             }
@@ -1115,7 +1144,7 @@
                 }
             } finally {
                 if (submitButton) {
-                    submitButton.disabled = false;
+                    submitButton.disabled = wasButtonDisabled;
                     submitButton.classList.remove('training-pulse');
                     submitButton.innerHTML = originalButtonHtml;
                 }
